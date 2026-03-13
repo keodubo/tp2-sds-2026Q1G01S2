@@ -15,13 +15,13 @@ NORMAL_RADIUS = 0.25
 LEADER_RADIUS = 0.35
 NORMAL_COLOR = np.array([0.68, 0.68, 0.68], dtype=float)
 LEADER_COLOR = np.array([0.92, 0.22, 0.14], dtype=float)
+TAU = 2.0 * np.pi
 
 
 def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
     rng = np.random.default_rng(config.seed)
     positions_xy = rng.uniform(0.0, config.L, size=(config.N, 2))
-    phase_offsets = rng.uniform(0.0, 2.0 * np.pi, size=config.N)
-    global_phase = float(rng.uniform(0.0, 2.0 * np.pi))
+    angles = rng.uniform(0.0, TAU, size=config.N)
     circular_phase = float(rng.uniform(0.0, 2.0 * np.pi))
 
     ids = np.arange(1, config.N + 1, dtype=int)
@@ -37,14 +37,23 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
     frames: list[TrajectoryFrame] = []
     if config.scenario == "C":
         positions_xy[0] = _circular_position(config, circular_phase, step=0)
-    movable_start = 1 if config.scenario == "C" else 0
+        angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step=0))
+    if config.scenario == "B":
+        angles[0] = float(config.leader_spec.theta0)
 
     for step in range(config.steps):
-        velocities_xy = _synthetic_velocities(config, rng, phase_offsets, global_phase, step)
+        if config.scenario == "B":
+            angles[0] = float(config.leader_spec.theta0)
+        if config.scenario == "B":
+            positions_xy[0] = positions_xy[0] % config.L
+        if config.scenario == "C":
+            positions_xy[0] = _circular_position(config, circular_phase, step)
+            angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step))
+
+        velocities_xy = angles_to_velocities(angles, config.v)
         if config.scenario == "B":
             velocities_xy[0] = _fixed_leader_velocity(config)
         if config.scenario == "C":
-            positions_xy[0] = _circular_position(config, circular_phase, step)
             velocities_xy[0] = _circular_leader_velocity(config, circular_phase, step)
 
         positions = np.column_stack((positions_xy, np.zeros(config.N, dtype=float)))
@@ -65,7 +74,27 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
             )
         )
 
-        positions_xy[movable_start:] = (positions_xy[movable_start:] + velocities_xy[movable_start:] * config.dt) % config.L
+        next_angles = compute_next_angles(
+            positions_xy,
+            angles,
+            interaction_radius=config.r,
+            box_length=config.L,
+            eta=config.eta,
+            rng=rng,
+        )
+        next_positions = positions_xy.copy()
+
+        if config.scenario == "C":
+            next_positions[1:] = (next_positions[1:] + velocities_xy[1:] * config.dt) % config.L
+            next_positions[0] = _circular_position(config, circular_phase, step + 1)
+            next_angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step + 1))
+        else:
+            next_positions = (next_positions + velocities_xy * config.dt) % config.L
+            if config.scenario == "B":
+                next_angles[0] = float(config.leader_spec.theta0)
+
+        positions_xy = next_positions
+        angles = _normalize_angles(next_angles)
 
     return frames
 
@@ -88,24 +117,51 @@ def write_simulation_run(config: SimulationConfig, output_root: Path, force: boo
     return run_directory
 
 
-def _synthetic_velocities(
-    config: SimulationConfig,
+def compute_next_angles(
+    positions_xy: np.ndarray,
+    angles: np.ndarray,
+    *,
+    interaction_radius: float,
+    box_length: float,
+    eta: float,
     rng: np.random.Generator,
-    phase_offsets: np.ndarray,
-    global_phase: float,
-    step: int,
 ) -> np.ndarray:
-    mix = np.clip(config.eta / np.pi, 0.0, 1.0)
-    alignment_angle = global_phase + 0.045 * step
-    alignment_vector = np.array([np.cos(alignment_angle), np.sin(alignment_angle)])
-    noise_angles = rng.uniform(0.0, 2.0 * np.pi, size=config.N)
-    noise_vectors = np.column_stack((np.cos(noise_angles), np.sin(noise_angles)))
-    bias_angles = phase_offsets + 0.08 * step
-    bias_vectors = 0.12 * np.column_stack((np.cos(bias_angles), np.sin(bias_angles)))
+    neighbors = neighbor_mask(positions_xy, interaction_radius=interaction_radius, box_length=box_length)
+    mean_angles = mean_neighbor_angles(angles, neighbors)
+    if np.isclose(eta, 0.0):
+        noise = np.zeros_like(mean_angles)
+    else:
+        noise = rng.uniform(-eta / 2.0, eta / 2.0, size=angles.shape[0])
+    return _normalize_angles(mean_angles + noise)
 
-    combined = ((1.0 - mix) * alignment_vector) + (mix * noise_vectors) + bias_vectors
-    norms = np.linalg.norm(combined, axis=1, keepdims=True)
-    return config.v * combined / norms
+
+def neighbor_mask(
+    positions_xy: np.ndarray,
+    *,
+    interaction_radius: float,
+    box_length: float,
+) -> np.ndarray:
+    deltas = minimum_image_displacements(positions_xy, box_length=box_length)
+    distances_sq = np.sum(deltas * deltas, axis=2)
+    mask = distances_sq <= (interaction_radius * interaction_radius)
+    np.fill_diagonal(mask, True)
+    return mask
+
+
+def minimum_image_displacements(positions_xy: np.ndarray, *, box_length: float) -> np.ndarray:
+    displacements = positions_xy[np.newaxis, :, :] - positions_xy[:, np.newaxis, :]
+    displacements -= box_length * np.rint(displacements / box_length)
+    return displacements
+
+
+def mean_neighbor_angles(angles: np.ndarray, neighbors: np.ndarray) -> np.ndarray:
+    sum_cos = neighbors @ np.cos(angles)
+    sum_sin = neighbors @ np.sin(angles)
+    return np.arctan2(sum_sin, sum_cos)
+
+
+def angles_to_velocities(angles: np.ndarray, speed: float) -> np.ndarray:
+    return speed * np.column_stack((np.cos(angles), np.sin(angles)))
 
 
 def _fixed_leader_velocity(config: SimulationConfig) -> np.ndarray:
@@ -126,10 +182,18 @@ def _circular_leader_velocity(config: SimulationConfig, phase0: float, step: int
     return tangent * config.v
 
 
+def _angle_from_vector(vector_xy: np.ndarray) -> float:
+    return float(np.arctan2(vector_xy[1], vector_xy[0]))
+
+
+def _normalize_angles(angles: np.ndarray) -> np.ndarray:
+    return (angles + np.pi) % TAU - np.pi
+
+
 def _velocity_colors(velocities_xy: np.ndarray) -> np.ndarray:
     angles = np.arctan2(velocities_xy[:, 1], velocities_xy[:, 0])
     colors = np.empty((velocities_xy.shape[0], 3), dtype=float)
     for index, angle in enumerate(angles):
-        hue = (angle % (2.0 * np.pi)) / (2.0 * np.pi)
+        hue = (angle % TAU) / TAU
         colors[index] = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
     return colors
