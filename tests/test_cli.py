@@ -71,13 +71,14 @@ def test_batch_and_analyze_generate_expected_artifacts(tmp_path: Path) -> None:
     trajectories = sorted(output_root.rglob("trajectory.extxyz"))
     assert len(trajectories) == 8
 
-    assert main(["analyze", "--runs-root", str(output_root)]) == 0
+    assert main(["analyze", "--runs-root", str(output_root), "--transient-fraction", "0.4"]) == 0
 
     summary_paths = sorted(output_root.rglob("summary.json"))
     assert len(summary_paths) == 8
 
     summary_payload = json.loads(summary_paths[0].read_text(encoding="utf-8"))
     assert set(summary_payload) == {"scenario", "eta", "seed", "t_start", "t_end", "va_mean_stationary"}
+    assert summary_payload["t_start"] > 0
 
     with (output_root / "aggregate.csv").open("r", encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
@@ -85,3 +86,33 @@ def test_batch_and_analyze_generate_expected_artifacts(tmp_path: Path) -> None:
     assert len(rows) == 4
     assert {row["scenario"] for row in rows} == {"A", "B"}
     assert {row["eta"] for row in rows} == {"0.100000", "1.400000"}
+
+
+def test_batch_skip_existing_reuses_completed_runs(tmp_path: Path) -> None:
+    output_root = tmp_path / "outputs"
+    args = [
+        "batch",
+        "--scenarios",
+        "A",
+        "--etas",
+        "0.1,0.5",
+        "--seeds",
+        "1,2",
+        "--steps",
+        "4",
+        "--output-root",
+        str(output_root),
+        "--N",
+        "12",
+        "--rho",
+        "0.12",
+    ]
+
+    assert main(args) == 0
+    run_directory = build_run_directory(output_root, "A", 0.1, 1)
+    contents_before = (run_directory / "trajectory.extxyz").read_text(encoding="utf-8")
+
+    assert main([*args, "--skip-existing"]) == 0
+
+    contents_after = (run_directory / "trajectory.extxyz").read_text(encoding="utf-8")
+    assert contents_before == contents_after

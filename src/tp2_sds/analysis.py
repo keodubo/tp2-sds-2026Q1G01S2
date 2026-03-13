@@ -13,12 +13,16 @@ from .io_extxyz import iter_extxyz
 DEFAULT_TRANSIENT_FRACTION = 0.3
 
 
-def analyze_run(run_directory: Path) -> RunSummary:
+def analyze_run(
+    run_directory: Path,
+    *,
+    transient_fraction: float = DEFAULT_TRANSIENT_FRACTION,
+) -> RunSummary:
     config = _load_simulation_config(run_directory / "run.json")
     va_series = list(compute_va_series(run_directory / "trajectory.extxyz", config.v))
     if not va_series:
         raise ValueError(f"No frames found in {run_directory / 'trajectory.extxyz'}")
-    t_start, t_end = stationary_window(len(va_series))
+    t_start, t_end = stationary_window(len(va_series), transient_fraction=transient_fraction)
     stationary_values = [value for _, value in va_series[t_start : t_end + 1]]
     summary = RunSummary(
         scenario=config.scenario,
@@ -41,6 +45,7 @@ def analyze_runs(
     scenario_filter: set[str] | None = None,
     eta_filter: set[str] | None = None,
     seed_filter: set[int] | None = None,
+    transient_fraction: float = DEFAULT_TRANSIENT_FRACTION,
 ) -> list[RunSummary]:
     summaries: list[RunSummary] = []
     for run_directory in discover_run_directories(
@@ -49,7 +54,7 @@ def analyze_runs(
         eta_filter=eta_filter,
         seed_filter=seed_filter,
     ):
-        summaries.append(analyze_run(run_directory))
+        summaries.append(analyze_run(run_directory, transient_fraction=transient_fraction))
     aggregate_path = runs_root / "aggregate.csv"
     write_aggregate_csv(aggregate_path, summaries)
     return summaries
@@ -67,6 +72,8 @@ def compute_va_series(trajectory_path: Path, speed: float) -> list[tuple[float, 
 def stationary_window(num_frames: int, transient_fraction: float = DEFAULT_TRANSIENT_FRACTION) -> tuple[int, int]:
     if num_frames <= 0:
         raise ValueError("num_frames must be positive")
+    if not 0.0 <= transient_fraction <= 1.0:
+        raise ValueError("transient_fraction must be between 0 and 1")
     t_end = num_frames - 1
     if num_frames == 1:
         return 0, 0

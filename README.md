@@ -3,9 +3,10 @@
 Base Python para el TP2 con:
 
 - paquete instalable en `src/tp2_sds`
-- CLI `tp2-sds` con `simulate`, `batch` y `analyze`
+- CLI `tp2-sds` con `simulate`, `batch`, `analyze`, `campaign` y `plot`
 - trayectorias multi-frame `extended XYZ` listas para OVITO
-- análisis reproducible sobre el mismo archivo de trayectoria
+- analisis reproducible sobre el mismo archivo de trayectoria
+- figuras reproducibles PNG/PDF y manifest para demos en OVITO
 
 ## Requisitos
 
@@ -37,6 +38,18 @@ Analizar corridas existentes:
 tp2-sds analyze --runs-root outputs
 ```
 
+Ejecutar una campana completa y generar figuras:
+
+```bash
+tp2-sds campaign --runs-root outputs
+```
+
+Regenerar figuras y manifest sin re-simular:
+
+```bash
+tp2-sds plot --runs-root outputs
+```
+
 ## Convención de salidas
 
 Cada corrida se escribe en:
@@ -54,3 +67,10 @@ Artefactos por corrida:
 Artefacto agregado:
 
 - `aggregate.csv`: promedio y desvío estándar por `scenario` y `eta`
+
+Artefactos de resultados:
+
+- `results/demo_manifest.csv`: corridas representativas para abrir en OVITO
+- `results/va_timeseries_<scenario>.png/.pdf`
+- `results/eta_vs_va_<scenario>.png/.pdf`
+- `results/eta_vs_va_comparison.png/.pdf`
