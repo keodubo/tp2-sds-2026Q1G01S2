@@ -3,7 +3,7 @@
 Base Python para el TP2 con:
 
 - paquete instalable en `src/tp2_sds`
-- CLI `tp2-sds` con `simulate`, `batch`, `analyze`, `campaign` y `plot`
+- CLI `tp2-sds` con `simulate`, `batch`, `analyze`, `campaign`, `plot` y `package`
 - trayectorias multi-frame `extended XYZ` listas para OVITO
 - analisis reproducible sobre el mismo archivo de trayectoria
 - figuras reproducibles PNG/PDF y manifest para demos en OVITO
@@ -50,6 +50,22 @@ Regenerar figuras y manifest sin re-simular:
 tp2-sds plot --runs-root outputs
 ```
 
+Preparar el bundle de entregables y templates:
+
+```bash
+tp2-sds package --runs-root outputs
+```
+
+## Runbook de ejecución final
+
+Para el cierre del TP conviene separar campañas por densidad usando roots distintos:
+
+- `outputs/rho=4.000000` para el caso obligatorio
+- `outputs/rho=2.000000` para el opcional de baja densidad
+- `outputs/rho=8.000000` para el opcional de alta densidad
+
+El runbook completo con comandos y criterio de refinamiento está en [docs/Runbook_Ejecucion_Final_TP2.md](docs/Runbook_Ejecucion_Final_TP2.md).
+
 ## Convención de salidas
 
 Cada corrida se escribe en:
@@ -57,6 +73,8 @@ Cada corrida se escribe en:
 ```text
 outputs/scenario=<A|B|C>/eta=<%.6f>/seed=<int>/
 ```
+
+Si se estudian varias densidades, cada una debe usar un `runs-root` distinto para evitar sobreescribir corridas con el mismo `scenario`, `eta` y `seed`.
 
 Artefactos por corrida:
 
@@ -74,3 +92,12 @@ Artefactos de resultados:
 - `results/va_timeseries_<scenario>.png/.pdf`
 - `results/eta_vs_va_<scenario>.png/.pdf`
 - `results/eta_vs_va_comparison.png/.pdf`
+
+Artefactos de cierre:
+
+- `deliverables/assets/`: copia de figuras, `aggregate.csv` y `demo_manifest.csv`
+- `deliverables/scenario_summary.csv`
+- `deliverables/ovito_demo_guide.md`
+- `deliverables/delivery_checklist.md`
+- `deliverables/presentation_template.tex`
+- `deliverables/report_template.tex`
