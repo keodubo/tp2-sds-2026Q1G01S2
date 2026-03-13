@@ -10,19 +10,23 @@ import numpy as np
 from .config import RunSummary, SimulationConfig, format_eta
 from .io_extxyz import iter_extxyz
 
+DEFAULT_TRANSIENT_FRACTION = 0.3
+
 
 def analyze_run(run_directory: Path) -> RunSummary:
     config = _load_simulation_config(run_directory / "run.json")
     va_series = list(compute_va_series(run_directory / "trajectory.extxyz", config.v))
     if not va_series:
         raise ValueError(f"No frames found in {run_directory / 'trajectory.extxyz'}")
+    t_start, t_end = stationary_window(len(va_series))
+    stationary_values = [value for _, value in va_series[t_start : t_end + 1]]
     summary = RunSummary(
         scenario=config.scenario,
         eta=config.eta,
         seed=config.seed,
-        t_start=0,
-        t_end=len(va_series) - 1,
-        va_mean_stationary=float(np.mean([value for _, value in va_series])),
+        t_start=t_start,
+        t_end=t_end,
+        va_mean_stationary=float(np.mean(stationary_values)),
     )
     (run_directory / "summary.json").write_text(
         json.dumps(summary.to_dict(), indent=2, sort_keys=True),
@@ -58,6 +62,17 @@ def compute_va_series(trajectory_path: Path, speed: float) -> list[tuple[float, 
         particle_count = frame.velocities.shape[0]
         values.append((frame.time, float(collective_velocity / (particle_count * speed))))
     return values
+
+
+def stationary_window(num_frames: int, transient_fraction: float = DEFAULT_TRANSIENT_FRACTION) -> tuple[int, int]:
+    if num_frames <= 0:
+        raise ValueError("num_frames must be positive")
+    t_end = num_frames - 1
+    if num_frames == 1:
+        return 0, 0
+    raw_start = int(np.floor(num_frames * transient_fraction))
+    t_start = min(t_end, max(1, raw_start))
+    return t_start, t_end
 
 
 def discover_run_directories(
@@ -99,12 +114,13 @@ def write_aggregate_csv(path: Path, summaries: list[RunSummary]) -> None:
         writer.writeheader()
         for scenario, eta in sorted(grouped):
             values = np.asarray(grouped[(scenario, eta)], dtype=float)
+            std = float(values.std(ddof=1)) if values.size > 1 else 0.0
             writer.writerow(
                 {
                     "scenario": scenario,
                     "eta": format_eta(eta),
                     "va_mean": f"{float(values.mean()):.8f}",
-                    "va_std": f"{float(values.std(ddof=0)):.8f}",
+                    "va_std": f"{std:.8f}",
                     "num_seeds": int(values.size),
                 }
             )

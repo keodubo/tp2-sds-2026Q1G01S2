@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import colorsys
 import json
 from pathlib import Path
 
@@ -44,18 +43,13 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
     for step in range(config.steps):
         if config.scenario == "B":
             angles[0] = float(config.leader_spec.theta0)
-        if config.scenario == "B":
-            positions_xy[0] = positions_xy[0] % config.L
         if config.scenario == "C":
             positions_xy[0] = _circular_position(config, circular_phase, step)
             angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step))
 
         velocities_xy = angles_to_velocities(angles, config.v)
-        if config.scenario == "B":
-            velocities_xy[0] = _fixed_leader_velocity(config)
-        if config.scenario == "C":
-            velocities_xy[0] = _circular_leader_velocity(config, circular_phase, step)
 
+        # Each frame records the instantaneous state at time t.
         positions = np.column_stack((positions_xy, np.zeros(config.N, dtype=float)))
         velocities = np.column_stack((velocities_xy, np.zeros(config.N, dtype=float)))
         vector_colors = _velocity_colors(velocities_xy)
@@ -82,16 +76,20 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
             eta=config.eta,
             rng=rng,
         )
+
+        if config.scenario == "C":
+            next_angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step + 1))
+        elif config.scenario == "B":
+            next_angles[0] = float(config.leader_spec.theta0)
+
+        next_velocities = angles_to_velocities(next_angles, config.v)
         next_positions = positions_xy.copy()
 
         if config.scenario == "C":
-            next_positions[1:] = (next_positions[1:] + velocities_xy[1:] * config.dt) % config.L
+            next_positions[1:] = (next_positions[1:] + next_velocities[1:] * config.dt) % config.L
             next_positions[0] = _circular_position(config, circular_phase, step + 1)
-            next_angles[0] = _angle_from_vector(_circular_leader_velocity(config, circular_phase, step + 1))
         else:
-            next_positions = (next_positions + velocities_xy * config.dt) % config.L
-            if config.scenario == "B":
-                next_angles[0] = float(config.leader_spec.theta0)
+            next_positions = (next_positions + next_velocities * config.dt) % config.L
 
         positions_xy = next_positions
         angles = _normalize_angles(next_angles)
@@ -164,16 +162,11 @@ def angles_to_velocities(angles: np.ndarray, speed: float) -> np.ndarray:
     return speed * np.column_stack((np.cos(angles), np.sin(angles)))
 
 
-def _fixed_leader_velocity(config: SimulationConfig) -> np.ndarray:
-    theta0 = float(config.leader_spec.theta0)
-    return np.array([np.cos(theta0), np.sin(theta0)]) * config.v
-
-
 def _circular_position(config: SimulationConfig, phase0: float, step: int) -> np.ndarray:
     phase = phase0 + float(config.leader_spec.omega) * step
     center = np.array([float(config.leader_spec.center_x), float(config.leader_spec.center_y)])
     offset = float(config.leader_spec.radius) * np.array([np.cos(phase), np.sin(phase)])
-    return center + offset
+    return (center + offset) % config.L
 
 
 def _circular_leader_velocity(config: SimulationConfig, phase0: float, step: int) -> np.ndarray:
@@ -192,8 +185,22 @@ def _normalize_angles(angles: np.ndarray) -> np.ndarray:
 
 def _velocity_colors(velocities_xy: np.ndarray) -> np.ndarray:
     angles = np.arctan2(velocities_xy[:, 1], velocities_xy[:, 0])
-    colors = np.empty((velocities_xy.shape[0], 3), dtype=float)
-    for index, angle in enumerate(angles):
-        hue = (angle % TAU) / TAU
-        colors[index] = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
-    return colors
+    hue = (angles % TAU) / TAU
+    sector = np.floor(hue * 6.0).astype(int) % 6
+    fractional = (hue * 6.0) - np.floor(hue * 6.0)
+    q = 1.0 - fractional
+    t = fractional
+
+    red = np.select(
+        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
+        [1.0, q, 0.0, 0.0, t, 1.0],
+    )
+    green = np.select(
+        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
+        [t, 1.0, 1.0, q, 0.0, 0.0],
+    )
+    blue = np.select(
+        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
+        [0.0, 0.0, t, 1.0, 1.0, q],
+    )
+    return np.column_stack((red, green, blue))

@@ -69,6 +69,33 @@ def test_compute_next_angles_eta_zero_aligns_to_neighbor_average() -> None:
     np.testing.assert_allclose(next_angles, np.full(3, np.pi / 2.0), atol=1e-12)
 
 
+def test_positions_advance_with_next_angle_in_vicsek_update() -> None:
+    config = make_simulation_config(
+        scenario="A",
+        eta=0.0,
+        steps=2,
+        seed=17,
+        L=100.0,
+        N=6,
+        rho=0.0006,
+        r=200.0,
+    )
+
+    frames = simulate_trajectory(config)
+    frame0 = frames[0]
+    frame1 = frames[1]
+
+    collective = frame0.velocities[:, :2].sum(axis=0)
+    expected_velocity = config.v * collective / np.linalg.norm(collective)
+    displacement = frame1.positions[:, :2] - frame0.positions[:, :2]
+
+    np.testing.assert_allclose(
+        displacement,
+        np.tile(expected_velocity, (config.N, 1)),
+        atol=1e-10,
+    )
+
+
 def test_simulate_trajectory_preserves_speed_and_box_invariants_for_standard_case() -> None:
     config = make_simulation_config(
         scenario="A",
@@ -163,3 +190,5 @@ def test_low_noise_run_is_more_ordered_than_high_noise_run(tmp_path: Path) -> No
     high_summary = analyze_run(high_run)
 
     assert low_summary.va_mean_stationary > high_summary.va_mean_stationary
+    assert low_summary.t_start > 0
+    assert high_summary.t_start > 0
