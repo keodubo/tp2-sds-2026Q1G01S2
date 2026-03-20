@@ -1,12 +1,10 @@
 # TP2 SDS 2026Q1G01S2
 
-Base Python para el TP2 con:
+Simulación de dinámica de partículas autopropulsadas (modelo de Vicsek) con tres escenarios:
 
-- paquete instalable en `src/tp2_sds`
-- CLI `tp2-sds` con `simulate`, `batch`, `analyze`, `campaign`, `plot` y `package`
-- trayectorias multi-frame `extended XYZ` listas para OVITO
-- analisis reproducible sobre el mismo archivo de trayectoria
-- figuras reproducibles PNG/PDF y manifest para demos en OVITO
+- **A**: sin líder
+- **B**: líder con dirección fija
+- **C**: líder con dirección variable
 
 ## Requisitos
 
@@ -18,111 +16,100 @@ Base Python para el TP2 con:
 python3 -m pip install -e ".[dev]"
 ```
 
-## Uso rápido
+## Estructura de salidas
 
-Generar una corrida:
+```
+outputs/                          ← trayectorias de simulación
+  scenario=A/eta=0.100000/seed=42/
+    run.json                      ← configuración de la corrida
+    trajectory.extxyz             ← trayectoria multi-frame
+
+results/                          ← figuras y animaciones generadas
+  viz_A.png, viz_B.png, viz_C.png
+  anim_A.gif, anim_B.gif, anim_C.gif
+  va_vs_eta_by_N_A.png, ...
+```
+
+## Uso: comandos individuales
+
+Todos los comandos se ejecutan con `tp2-sds` (si se instaló el paquete) o con `PYTHONPATH=src python3 -m tp2_sds.cli`.
+
+### Simular una corrida
 
 ```bash
-tp2-sds simulate --scenario A --eta 0.150000 --seed 7 --steps 100
+tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 2000 --N 300 --L 25
 ```
 
-Generar una animación GIF a partir de una trayectoria:
+Parámetros principales:
+
+| Parámetro     | Descripción                          | Default |
+|---------------|--------------------------------------|---------|
+| `--scenario`  | Escenario: A, B o C                  | —       |
+| `--eta`       | Nivel de ruido                       | —       |
+| `--seed`      | Semilla para reproducibilidad        | —       |
+| `--steps`     | Cantidad de pasos de simulación      | —       |
+| `--N`         | Cantidad de partículas               | —       |
+| `--L`         | Tamaño de la caja                    | 10.0    |
+| `--force`     | Sobreescribir corrida existente      | false   |
+
+La trayectoria se guarda en `outputs/scenario=<X>/eta=<Y>/seed=<Z>/trajectory.extxyz`.
+
+### Generar una animación GIF
+
+A partir de una trayectoria ya simulada:
 
 ```bash
-tp2-sds animate outputs/scenario=A/eta=0.150000/seed=7/trajectory.extxyz --output ./animacion_A
+tp2-sds animate outputs/scenario=A/eta=0.100000/seed=42/trajectory.extxyz --output results/anim_A
 ```
 
-O si prefieres no usar el comando instalado, puedes ejecutar el módulo de Python directamente (ej. para otra prueba manual):
+Opciones: `--frame-step` (default 10), `--fps` (default 20), `--arrow-scale` (default 2.0), `--dpi` (default 150).
+
+### Generar una figura estática (HSV)
 
 ```bash
-PYTHONPATH=src python3 -m tp2_sds.cli simulate --scenario B --eta 0.1 --seed 42 --steps 500 --N 100 --L 10.0 --output-root /tmp/tp2_sim_output
-PYTHONPATH=src python3 -m tp2_sds.cli animate /tmp/tp2_sim_output/scenario=B/eta=0.100000/seed=42/trajectory.extxyz --output ./mi_animacion_B
+tp2-sds visualize --trajectory outputs/scenario=A/eta=0.100000/seed=42/trajectory.extxyz --eta 0.1 --output results/viz_A
 ```
 
-Abrir una trayectoria directamente en OVITO (macOS):
+También puede simular y visualizar en un solo paso (sin trayectoria previa):
 
 ```bash
-open -a Ovito outputs/scenario=A/eta=0.150000/seed=7/trajectory.extxyz
+tp2-sds visualize --scenario B --eta 0.1 --N 300 --L 25 --steps 2000 --seed 42 --output results/viz_B
 ```
 
-Generar un batch:
+### Generar gráfico va vs eta (sweep)
+
+Barrido de alineación para distintos N:
 
 ```bash
-tp2-sds batch --scenarios A,B,C --etas 0.1,0.5 --seeds 1,2,3 --steps 120
+tp2-sds sweep --scenario A --N-values 40,100,400,4000 --etas 0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0 --steps 2000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
 ```
 
-Generar un barrido (sweep) rápido para el gráfico de alineación ($V_a$) vs ruido ($\eta$):
+### Batch de simulaciones
 
 ```bash
-tp2-sds sweep --scenario A --N-values 40,100,400 --output ./grafico_va_vs_eta
+tp2-sds batch --scenarios A,B,C --etas 0.1,0.5,2.0 --seeds 1,2,3 --steps 2000
 ```
 
-Analizar corridas existentes:
+## Generar todo de una vez
+
+El script `generate_all.sh` ejecuta todas las simulaciones, visualizaciones, animaciones y sweeps:
 
 ```bash
-tp2-sds analyze --runs-root outputs
+chmod +x generate_all.sh
+./generate_all.sh
 ```
 
-Ejecutar una campana completa y generar figuras:
+Este script realiza los siguientes pasos:
+
+1. **Simulaciones**: corre los escenarios A, B y C con eta bajo (0.1) y alto (2.0), N=300, L=25, 2000 pasos.
+2. **Figuras estáticas**: genera `results/viz_A.png`, `viz_B.png`, `viz_C.png` a partir de las trayectorias con eta bajo.
+3. **Animaciones GIF**: genera `results/anim_A.gif`, `anim_B.gif`, `anim_C.gif`.
+4. **Sweeps va vs eta**: genera gráficos de alineación vs ruido para N = 40, 100, 400 y 4000 con 10 seeds, para cada escenario.
+
+Los resultados quedan en la carpeta `results/`.
+
+## Tests
 
 ```bash
-tp2-sds campaign --runs-root outputs
+pytest
 ```
-
-Regenerar figuras y manifest sin re-simular:
-
-```bash
-tp2-sds plot --runs-root outputs
-```
-
-Preparar el bundle de entregables y templates:
-
-```bash
-tp2-sds package --runs-root outputs
-```
-
-## Runbook de ejecución final
-
-Para el cierre del TP conviene separar campañas por densidad usando roots distintos:
-
-- `outputs/rho=4.000000` para el caso obligatorio
-- `outputs/rho=2.000000` para el opcional de baja densidad
-- `outputs/rho=8.000000` para el opcional de alta densidad
-
-El runbook completo con comandos y criterio de refinamiento está en [docs/Runbook_Ejecucion_Final_TP2.md](docs/Runbook_Ejecucion_Final_TP2.md).
-
-## Convención de salidas
-
-Cada corrida se escribe en:
-
-```text
-outputs/scenario=<A|B|C>/eta=<%.6f>/seed=<int>/
-```
-
-Si se estudian varias densidades, cada una debe usar un `runs-root` distinto para evitar sobreescribir corridas con el mismo `scenario`, `eta` y `seed`.
-
-Artefactos por corrida:
-
-- `run.json`: configuración serializada
-- `trajectory.extxyz`: trayectoria OVITO-ready
-- `summary.json`: resumen de análisis
-
-Artefacto agregado:
-
-- `aggregate.csv`: promedio y desvío estándar por `scenario` y `eta`
-
-Artefactos de resultados:
-
-- `results/demo_manifest.csv`: corridas representativas para abrir en OVITO
-- `results/va_timeseries_<scenario>.png/.pdf`
-- `results/eta_vs_va_<scenario>.png/.pdf`
-- `results/eta_vs_va_comparison.png/.pdf`
-
-Artefactos de cierre:
-
-- `deliverables/assets/`: copia de figuras, `aggregate.csv` y `demo_manifest.csv`
-- `deliverables/scenario_summary.csv`
-- `deliverables/ovito_demo_guide.md`
-- `deliverables/delivery_checklist.md`
-- `deliverables/presentation_template.tex`
-- `deliverables/report_template.tex`

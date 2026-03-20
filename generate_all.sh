@@ -7,8 +7,8 @@
 #   ./generate_all.sh
 #
 # Outputs:
-#   outputs/scenario=X/eta=.../seed=.../trajectory.extxyz  → para OVITO
 #   results/viz_A.png, viz_B.png, viz_C.png                → figuras estáticas HSV
+#   results/anim_A.gif, anim_B.gif, anim_C.gif             → animaciones GIF
 #   results/va_vs_eta_by_N_A.png                           → va vs η distintos N
 #   results/va_vs_eta_by_N_B.png
 #   results/va_vs_eta_by_N_C.png
@@ -33,7 +33,7 @@ ETA_LOW=0.1       # ruido bajo  → estado ordenado (va ≈ 1)
 ETA_HIGH=2.0      # ruido alto  → estado desordenado (va ≈ 0)
 
 echo "=============================================="
-echo " PASO 1: Simulaciones (extxyz para OVITO)"
+echo " PASO 1: Simulaciones"
 echo "=============================================="
 
 for SCENARIO in A B C; do
@@ -44,12 +44,6 @@ for SCENARIO in A B C; do
             --steps "$STEPS" --N "$N" --L "$L" --force
     done
 done
-
-echo ""
-echo "  Trayectorias listas. Para abrir en OVITO:"
-echo "    ovito outputs/scenario=A/eta=0.100000/seed=42/trajectory.extxyz"
-echo "    ovito outputs/scenario=B/eta=0.100000/seed=42/trajectory.extxyz"
-echo "    ovito outputs/scenario=C/eta=0.100000/seed=42/trajectory.extxyz"
 
 echo ""
 echo "=============================================="
@@ -63,6 +57,18 @@ for SCENARIO in A B C; do
         --trajectory "$TRAJ" \
         --eta "$ETA_LOW" \
         --output "$RESULTS/viz_${SCENARIO}"
+done
+
+echo ""
+echo "=============================================="
+echo " PASO 2b: Animaciones GIF"
+echo "=============================================="
+
+for SCENARIO in A B C; do
+    TRAJ="outputs/scenario=${SCENARIO}/eta=0.100000/seed=${SEED}/trajectory.extxyz"
+    echo "→ Animación escenario $SCENARIO (η=$ETA_LOW) ..."
+    run_cli animate "$TRAJ" \
+        --output "$RESULTS/anim_${SCENARIO}"
 done
 
 echo ""
@@ -92,9 +98,9 @@ echo "=============================================="
 echo ""
 echo "Archivos generados:"
 echo ""
-echo "  OVITO (extxyz):"
-ls outputs/scenario=*/eta=*/seed=*/trajectory.extxyz 2>/dev/null | sed 's/^/    /'
-echo ""
 echo "  Figuras (PNG + PDF):"
 ls "$RESULTS"/*.png 2>/dev/null | sed 's/^/    /'
+echo ""
+echo "  Animaciones (GIF):"
+ls "$RESULTS"/*.gif 2>/dev/null | sed 's/^/    /'
 echo ""
