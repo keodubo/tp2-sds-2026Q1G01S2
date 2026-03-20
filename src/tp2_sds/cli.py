@@ -9,7 +9,7 @@ from typing import Sequence
 from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs
 from .config import DEFAULT_OUTPUTS_ROOT, DEFAULT_RHO, format_eta, make_simulation_config, normalize_scenario
 from .deliverables import package_deliverables
-from .reporting import CampaignSpec, default_campaign_spec, generate_results, run_campaign
+from .reporting import CampaignSpec, animate_trajectory, default_campaign_spec, generate_results, run_campaign
 from .simulation import write_simulation_run
 
 
@@ -55,6 +55,15 @@ def build_parser() -> argparse.ArgumentParser:
     plot_parser.add_argument("--seed", help="Optional comma-separated seed filter")
     plot_parser.add_argument("--transient-fraction", type=float, default=DEFAULT_TRANSIENT_FRACTION)
     plot_parser.set_defaults(handler=_handle_plot)
+
+    animate_parser = subparsers.add_parser("animate", help="Generate animation GIF from a trajectory file")
+    animate_parser.add_argument("trajectory", type=Path, help="Path to .extxyz trajectory file")
+    animate_parser.add_argument("--output", type=Path, default=None, help="Output path (without suffix)")
+    animate_parser.add_argument("--frame-step", type=int, default=10)
+    animate_parser.add_argument("--fps", type=int, default=20)
+    animate_parser.add_argument("--arrow-scale", type=float, default=2.0)
+    animate_parser.add_argument("--dpi", type=int, default=150)
+    animate_parser.set_defaults(handler=_handle_animate)
 
     package_parser = subparsers.add_parser("package", help="Validate results and assemble deliverable templates")
     package_parser.add_argument("--runs-root", type=Path, default=DEFAULT_OUTPUTS_ROOT)
@@ -160,6 +169,20 @@ def _handle_plot(args: argparse.Namespace) -> int:
         seed_filter=seed_filter,
     )
     print(f"Generated {len(summaries)} summaries and wrote results to {results_directory}")
+    return 0
+
+
+def _handle_animate(args: argparse.Namespace) -> int:
+    output = args.output if args.output is not None else args.trajectory.with_suffix("")
+    gif_path = animate_trajectory(
+        args.trajectory,
+        output,
+        frame_step=args.frame_step,
+        fps=args.fps,
+        arrow_scale=args.arrow_scale,
+        dpi=args.dpi,
+    )
+    print(gif_path)
     return 0
 
 

@@ -24,10 +24,12 @@ from .config import (
     format_eta,
     make_simulation_config,
 )
-from .simulation import write_simulation_run
+from .io_extxyz import iter_extxyz
+from .simulation import LEADER_TYPE, write_simulation_run
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter
 
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
@@ -174,6 +176,12 @@ def generate_results(
         _plot_eta_vs_va(results_directory, scenario, points)
     _plot_eta_vs_va_comparison(results_directory, aggregated_by_scenario)
 
+    for selection in selections:
+        eta_tag = format_eta(selection.record.config.eta)
+        seed = selection.record.config.seed
+        gif_name = f"animation_{selection.scenario}_{selection.role}_eta{eta_tag}_seed{seed}"
+        animate_trajectory(selection.record.trajectory_path, results_directory / gif_name)
+
     return results_directory
 
 
@@ -302,6 +310,10 @@ def _plot_va_timeseries(results_directory: Path, scenario: str, selections: list
         cutoff_time = times[record.summary.t_start]
         axis.axvline(cutoff_time, color=color, linestyle="--", linewidth=1.0, alpha=0.5)
         axis.axvspan(times[0], cutoff_time, alpha=0.07, color=color)
+        mid_transient = (times[0] + cutoff_time) / 2
+        axis.text(mid_transient, 1.0, "transiente", ha="center", va="top", fontsize=8, color=color, alpha=0.7)
+        mid_stationary = (cutoff_time + times[-1]) / 2
+        axis.text(mid_stationary, 1.0, "estado estacionario", ha="center", va="top", fontsize=8, color=color, alpha=0.7)
 
     axis.set_xlabel(r"Tiempo (pasos)")
     axis.set_ylabel(r"Polarización $v_a$")
@@ -321,6 +333,7 @@ def _plot_eta_vs_va(results_directory: Path, scenario: str, points: list[Aggrega
     axis.errorbar(etas, means, yerr=stds, fmt="o", color="C0", markersize=4, capsize=3)
     axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
     axis.set_ylabel(r"Polarización media ($v_a$)")
+    axis.set_title(f"Escenario {scenario}")
     axis.set_ylim(-0.05, 1.05)
     _save_figure(figure, results_directory / f"eta_vs_va_{scenario}")
 
@@ -350,6 +363,7 @@ def _plot_eta_vs_va_comparison(
 
     axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
     axis.set_ylabel(r"Polarización media ($v_a$)")
+    axis.set_title("Comparación entre escenarios")
     axis.set_ylim(-0.05, 1.05)
     axis.legend()
     _save_figure(figure, results_directory / "eta_vs_va_comparison")
@@ -357,6 +371,95 @@ def _plot_eta_vs_va_comparison(
 
 def _run_is_complete(run_directory: Path) -> bool:
     return (run_directory / "run.json").exists() and (run_directory / "trajectory.extxyz").exists()
+
+
+def animate_trajectory(
+    trajectory_path: Path,
+    output_path: Path,
+    *,
+    box_length: float = 10.0,
+    frame_step: int = 10,
+    fps: int = 20,
+    arrow_scale: float = 2.0,
+    dpi: int = 150,
+) -> Path:
+    from .simulation import _BLUE_GRADIENT, TAU
+
+    frames: list[dict] = []
+    for i, frame in enumerate(iter_extxyz(trajectory_path)):
+        if i % frame_step != 0:
+            continue
+        L = frame.lattice[0]
+        if L > 0:
+            box_length = L
+        leader_mask = frame.types == LEADER_TYPE
+        normal_mask = ~leader_mask
+        angles = np.arctan2(frame.velocities[:, 1], frame.velocities[:, 0])
+        t = (angles % TAU) / TAU
+        n_stops = len(_BLUE_GRADIENT)
+        scaled = t * n_stops
+        seg = np.floor(scaled).astype(int) % n_stops
+        frac = scaled - np.floor(scaled)
+        colors = _BLUE_GRADIENT[seg] + (_BLUE_GRADIENT[(seg + 1) % n_stops] - _BLUE_GRADIENT[seg]) * frac[:, np.newaxis]
+        frames.append({
+            "x": frame.positions[:, 0].copy(),
+            "y": frame.positions[:, 1].copy(),
+            "u": np.cos(angles),
+            "v": np.sin(angles),
+            "colors": colors,
+            "leader": leader_mask,
+            "normal": normal_mask,
+            "time": frame.time,
+        })
+    if not frames:
+        raise ValueError(f"No frames found in {trajectory_path}")
+
+    figure, axis = plt.subplots(figsize=(6, 6))
+    axis.set_facecolor("black")
+    axis.set_aspect("equal")
+    axis.set_xlim(0, box_length)
+    axis.set_ylim(0, box_length)
+    axis.set_xticks([])
+    axis.set_yticks([])
+    title = axis.set_title(f"t = {frames[0]['time']:.0f}", color="white", fontsize=12)
+    figure.patch.set_facecolor("black")
+
+    f0 = frames[0]
+    nm = f0["normal"]
+    lm = f0["leader"]
+    quiver_normal = axis.quiver(
+        f0["x"][nm], f0["y"][nm], f0["u"][nm], f0["v"][nm],
+        color=f0["colors"][nm],
+        angles="xy", scale_units="xy", scale=arrow_scale,
+        width=0.004, headwidth=3, headlength=4,
+    )
+    quiver_leader = None
+    if lm.any():
+        quiver_leader = axis.quiver(
+            f0["x"][lm], f0["y"][lm], f0["u"][lm], f0["v"][lm],
+            color="#ff0000", edgecolor="white", linewidth=1.0,
+            angles="xy", scale_units="xy", scale=arrow_scale * 0.7,
+            width=0.010, headwidth=3, headlength=4, zorder=10,
+        )
+
+    def _update(frame_index: int):
+        data = frames[frame_index]
+        nm = data["normal"]
+        lm = data["leader"]
+        quiver_normal.set_offsets(np.column_stack((data["x"][nm], data["y"][nm])))
+        quiver_normal.set_UVC(data["u"][nm], data["v"][nm])
+        quiver_normal.set_color(data["colors"][nm])
+        if quiver_leader is not None and lm.any():
+            quiver_leader.set_offsets(np.column_stack((data["x"][lm], data["y"][lm])))
+            quiver_leader.set_UVC(data["u"][lm], data["v"][lm])
+        title.set_text(f"t = {data['time']:.0f}")
+
+    animation = FuncAnimation(figure, _update, frames=len(frames), interval=1000 // fps, blit=False)
+    gif_path = output_path.with_suffix(".gif")
+    gif_path.parent.mkdir(parents=True, exist_ok=True)
+    animation.save(str(gif_path), writer=PillowWriter(fps=fps), dpi=dpi)
+    plt.close(figure)
+    return gif_path
 
 
 def _save_figure(figure: plt.Figure, base_path: Path) -> None:

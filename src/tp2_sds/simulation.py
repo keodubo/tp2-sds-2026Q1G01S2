@@ -13,7 +13,7 @@ LEADER_TYPE = 2
 NORMAL_RADIUS = 0.25
 LEADER_RADIUS = 0.35
 NORMAL_COLOR = np.array([0.68, 0.68, 0.68], dtype=float)
-LEADER_COLOR = np.array([0.92, 0.22, 0.14], dtype=float)
+LEADER_COLOR = np.array([1.0, 0.0, 0.0], dtype=float)
 TAU = 2.0 * np.pi
 
 
@@ -254,24 +254,21 @@ def _normalize_angles(angles: np.ndarray) -> np.ndarray:
     return (angles + np.pi) % TAU - np.pi
 
 
+_BLUE_GRADIENT = np.array([
+    [0x69, 0xDA, 0xF8],
+    [0x9F, 0xCB, 0xFD],
+    [0xCC, 0xF3, 0xFD],
+    [0xD7, 0xEA, 0xFE],
+], dtype=float) / 255.0
+
+
 def _velocity_colors(velocities_xy: np.ndarray) -> np.ndarray:
     angles = np.arctan2(velocities_xy[:, 1], velocities_xy[:, 0])
-    hue = (angles % TAU) / TAU
-    sector = np.floor(hue * 6.0).astype(int) % 6
-    fractional = (hue * 6.0) - np.floor(hue * 6.0)
-    q = 1.0 - fractional
-    t = fractional
-
-    red = np.select(
-        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
-        [1.0, q, 0.0, 0.0, t, 1.0],
-    )
-    green = np.select(
-        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
-        [t, 1.0, 1.0, q, 0.0, 0.0],
-    )
-    blue = np.select(
-        [sector == 0, sector == 1, sector == 2, sector == 3, sector == 4, sector == 5],
-        [0.0, 0.0, t, 1.0, 1.0, q],
-    )
-    return np.column_stack((red, green, blue))
+    t = (angles % TAU) / TAU
+    n_stops = len(_BLUE_GRADIENT)
+    scaled = t * n_stops
+    segment = np.floor(scaled).astype(int) % n_stops
+    frac = scaled - np.floor(scaled)
+    c0 = _BLUE_GRADIENT[segment]
+    c1 = _BLUE_GRADIENT[(segment + 1) % n_stops]
+    return c0 + (c1 - c0) * frac[:, np.newaxis]
