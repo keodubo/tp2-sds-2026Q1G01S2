@@ -148,48 +148,71 @@ def _cim_neighbor_mask(
     interaction_radius: float,
     box_length: float,
 ) -> np.ndarray:
-    """Cell Index Method (CIM) for neighbor detection with periodic boundary conditions."""
+    """Cell Index Method (CIM) for neighbor detection with periodic boundary conditions.
+
+    Follows the same structure as the TP1 C++ Grid implementation:
+    iterate by cell, check pairs within the same cell, then check
+    4 asymmetric neighbor cells {(1,0), (-1,1), (0,1), (1,1)} to
+    avoid double-counting.
+    """
     n = positions_xy.shape[0]
-    num_cells = max(1, int(box_length / interaction_radius))
-    cell_size = box_length / num_cells
+    M = max(1, int(box_length / interaction_radius))
+    cell_size = box_length / M
     r_sq = interaction_radius * interaction_radius
 
-    # Assign each particle to a cell.
-    cell_indices = np.floor(positions_xy / cell_size).astype(int) % num_cells
-    cell_x = cell_indices[:, 0]
-    cell_y = cell_indices[:, 1]
+    # Assign each particle to a cell (clamp for particles exactly on boundary L).
+    cell_indices = np.floor(positions_xy / cell_size).astype(int)
+    cell_indices = np.clip(cell_indices, 0, M - 1)
 
-    # Build cell lists: head[cx, cy] is the first particle in cell (cx, cy),
-    # next_in_cell[i] is the next particle in the same cell as particle i.
-    head = np.full((num_cells, num_cells), -1, dtype=int)
-    next_in_cell = np.full(n, -1, dtype=int)
+    # Build cell lists: cells[cy * M + cx] -> list of particle indices.
+    cells: list[list[int]] = [[] for _ in range(M * M)]
     for i in range(n):
-        cx, cy = cell_x[i], cell_y[i]
-        next_in_cell[i] = head[cx, cy]
-        head[cx, cy] = i
+        cx, cy = cell_indices[i, 0], cell_indices[i, 1]
+        cells[cy * M + cx].append(i)
 
     mask = np.zeros((n, n), dtype=bool)
-    offsets = np.array([-1, 0, 1])
+    np.fill_diagonal(mask, True)
 
-    for i in range(n):
-        mask[i, i] = True
-        cx_i, cy_i = cell_x[i], cell_y[i]
-        xi, yi = positions_xy[i]
-        for dcx in offsets:
-            for dcy in offsets:
-                ncx = (cx_i + dcx) % num_cells
-                ncy = (cy_i + dcy) % num_cells
-                j = head[ncx, ncy]
-                while j != -1:
-                    if j > i:
-                        dx = positions_xy[j, 0] - xi
-                        dy = positions_xy[j, 1] - yi
-                        dx -= box_length * round(dx / box_length)
-                        dy -= box_length * round(dy / box_length)
+    # 4 asymmetric neighbor offsets (same as TP1 Grid.cpp).
+    neighbor_offsets = ((1, 0), (-1, 1), (0, 1), (1, 1))
+
+    for cy in range(M):
+        for cx in range(M):
+            cell = cells[cy * M + cx]
+
+            # Pairs within the same cell.
+            for ii in range(len(cell)):
+                i = cell[ii]
+                for jj in range(ii + 1, len(cell)):
+                    j = cell[jj]
+                    dx = abs(positions_xy[i, 0] - positions_xy[j, 0])
+                    dy = abs(positions_xy[i, 1] - positions_xy[j, 1])
+                    dx = min(dx, box_length - dx)
+                    dy = min(dy, box_length - dy)
+                    if dx * dx + dy * dy <= r_sq:
+                        mask[i, j] = True
+                        mask[j, i] = True
+
+            # 4 neighbor cells.
+            for dcx, dcy in neighbor_offsets:
+                nx = ((cx + dcx) % M + M) % M
+                ny = ((cy + dcy) % M + M) % M
+                nidx = ny * M + nx
+
+                # Skip if neighbor wraps to same cell (M=1 periodic).
+                if nidx == cy * M + cx:
+                    continue
+
+                neighbor_cell = cells[nidx]
+                for i in cell:
+                    for j in neighbor_cell:
+                        dx = abs(positions_xy[i, 0] - positions_xy[j, 0])
+                        dy = abs(positions_xy[i, 1] - positions_xy[j, 1])
+                        dx = min(dx, box_length - dx)
+                        dy = min(dy, box_length - dy)
                         if dx * dx + dy * dy <= r_sq:
                             mask[i, j] = True
                             mask[j, i] = True
-                    j = next_in_cell[j]
 
     return mask
 
