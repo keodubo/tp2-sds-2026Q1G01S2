@@ -551,7 +551,7 @@ def animate_trajectory(
     output_path: Path,
     *,
     box_length: float = 10.0,
-    frame_step: int = 10,
+    frame_step: int = 1,
     fps: int = 20,
     arrow_scale: float = 2.0,
     dpi: int = 150,
