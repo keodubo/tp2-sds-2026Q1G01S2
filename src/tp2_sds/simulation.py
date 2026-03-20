@@ -13,7 +13,7 @@ LEADER_TYPE = 2
 NORMAL_RADIUS = 0.25
 LEADER_RADIUS = 0.35
 NORMAL_COLOR = np.array([0.68, 0.68, 0.68], dtype=float)
-LEADER_COLOR = np.array([1.0, 0.0, 0.0], dtype=float)
+LEADER_COLOR = np.array([0.8, 0.0, 0.8], dtype=float)  # magenta #CC00CC
 TAU = 2.0 * np.pi
 
 
@@ -54,6 +54,11 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
         velocities = np.column_stack((velocities_xy, np.zeros(config.N, dtype=float)))
         vector_colors = _velocity_colors(velocities_xy)
 
+        # Per-frame particle body colors: HSV for normals, magenta for leader
+        frame_colors = vector_colors.copy()
+        if config.scenario in {"B", "C"}:
+            frame_colors[0] = LEADER_COLOR
+
         frames.append(
             TrajectoryFrame(
                 ids=ids.copy(),
@@ -61,7 +66,7 @@ def simulate_trajectory(config: SimulationConfig) -> list[TrajectoryFrame]:
                 positions=positions,
                 velocities=velocities,
                 radii=radii.copy(),
-                colors=colors.copy(),
+                colors=frame_colors,
                 vector_colors=vector_colors,
                 time=step * config.dt,
                 lattice=lattice_for_box(config.L),
@@ -264,11 +269,17 @@ _BLUE_GRADIENT = np.array([
 
 def _velocity_colors(velocities_xy: np.ndarray) -> np.ndarray:
     angles = np.arctan2(velocities_xy[:, 1], velocities_xy[:, 0])
-    t = (angles % TAU) / TAU
-    n_stops = len(_BLUE_GRADIENT)
-    scaled = t * n_stops
-    segment = np.floor(scaled).astype(int) % n_stops
-    frac = scaled - np.floor(scaled)
-    c0 = _BLUE_GRADIENT[segment]
-    c1 = _BLUE_GRADIENT[(segment + 1) % n_stops]
-    return c0 + (c1 - c0) * frac[:, np.newaxis]
+    hue = (angles % TAU) / TAU
+    return _hsv_to_rgb(hue)
+
+
+def _hsv_to_rgb(h: np.ndarray) -> np.ndarray:
+    """Convert hue array (0-1) to RGB with S=V=1 (pure HSV spectrum)."""
+    h6 = (h % 1.0) * 6.0
+    i = np.floor(h6).astype(int)
+    f = h6 - i
+    i = i % 6
+    r = np.where(i == 0, 1.0, np.where(i == 1, 1.0 - f, np.where(i == 2, 0.0, np.where(i == 3, 0.0, np.where(i == 4, f, 1.0)))))
+    g = np.where(i == 0, f, np.where(i == 1, 1.0, np.where(i == 2, 1.0, np.where(i == 3, 1.0 - f, np.where(i == 4, 0.0, 0.0)))))
+    b = np.where(i == 0, 0.0, np.where(i == 1, 0.0, np.where(i == 2, f, np.where(i == 3, 1.0, np.where(i == 4, 1.0, 1.0 - f)))))
+    return np.column_stack([r, g, b])

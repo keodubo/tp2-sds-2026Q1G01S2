@@ -9,7 +9,7 @@ from typing import Sequence
 from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs
 from .config import DEFAULT_OUTPUTS_ROOT, DEFAULT_RHO, format_eta, make_simulation_config, normalize_scenario
 from .deliverables import package_deliverables
-from .reporting import CampaignSpec, animate_trajectory, default_campaign_spec, generate_results, run_campaign
+from .reporting import CampaignSpec, animate_trajectory, default_campaign_spec, generate_results, plot_va_vs_eta_by_N, plot_visualization_figure, run_campaign
 from .simulation import write_simulation_run
 
 
@@ -64,6 +64,28 @@ def build_parser() -> argparse.ArgumentParser:
     animate_parser.add_argument("--arrow-scale", type=float, default=2.0)
     animate_parser.add_argument("--dpi", type=int, default=150)
     animate_parser.set_defaults(handler=_handle_animate)
+
+    visualize_parser = subparsers.add_parser("visualize", help="Generate static HSV visualization figure")
+    visualize_parser.add_argument("--trajectory", type=Path, default=None, help="Path to .extxyz trajectory file")
+    visualize_parser.add_argument("--output", type=Path, default=Path("/tmp/visualization"), help="Output path (without suffix)")
+    visualize_parser.add_argument("--scenario", default="B")
+    visualize_parser.add_argument("--eta", type=float, default=0.1)
+    visualize_parser.add_argument("--N", type=int, default=300)
+    visualize_parser.add_argument("--L", type=float, default=25.0)
+    visualize_parser.add_argument("--steps", type=int, default=2000)
+    visualize_parser.add_argument("--seed", type=int, default=42)
+    visualize_parser.add_argument("--dpi", type=int, default=200)
+    visualize_parser.set_defaults(handler=_handle_visualize)
+
+    sweep_parser = subparsers.add_parser("sweep", help="Generate va vs eta plot for different N values")
+    sweep_parser.add_argument("--scenario", default="A", help="Scenario A, B, or C")
+    sweep_parser.add_argument("--N-values", default="40,100,400", help="Comma-separated N values")
+    sweep_parser.add_argument("--etas", help="Comma-separated eta values (default 0.0..5.0 step 0.25)")
+    sweep_parser.add_argument("--steps", type=int, default=2000)
+    sweep_parser.add_argument("--seed", type=int, default=1)
+    sweep_parser.add_argument("--L", type=float, default=None, help="Box size (default: computed from N and rho=4)")
+    sweep_parser.add_argument("--output", type=Path, default=Path("/tmp/va_vs_eta_by_N"), help="Output path (without suffix)")
+    sweep_parser.set_defaults(handler=_handle_sweep)
 
     package_parser = subparsers.add_parser("package", help="Validate results and assemble deliverable templates")
     package_parser.add_argument("--runs-root", type=Path, default=DEFAULT_OUTPUTS_ROOT)
@@ -183,6 +205,58 @@ def _handle_animate(args: argparse.Namespace) -> int:
         dpi=args.dpi,
     )
     print(gif_path)
+    return 0
+
+
+def _handle_visualize(args: argparse.Namespace) -> int:
+    import tempfile
+
+    from .io_extxyz import write_extxyz
+    from .simulation import simulate_trajectory
+
+    if args.trajectory is not None:
+        trajectory_path = args.trajectory
+        eta = args.eta
+    else:
+        config = make_simulation_config(
+            scenario=args.scenario,
+            eta=args.eta,
+            steps=args.steps,
+            seed=args.seed,
+            L=args.L,
+            rho=None,
+            N=args.N,
+        )
+        frames = simulate_trajectory(config)
+        tmp_dir = Path(tempfile.mkdtemp(prefix="tp2_viz_"))
+        trajectory_path = tmp_dir / "trajectory.extxyz"
+        write_extxyz(trajectory_path, frames)
+        eta = args.eta
+
+    result = plot_visualization_figure(
+        trajectory_path,
+        args.output,
+        eta=eta,
+        dpi=args.dpi,
+    )
+    print(result)
+    return 0
+
+
+def _handle_sweep(args: argparse.Namespace) -> int:
+    N_values = tuple(int(v) for v in _parse_csv(args.N_values))
+    etas = tuple(float(v) for v in _parse_csv(args.etas)) if args.etas else None
+    scenario = normalize_scenario(args.scenario)
+    result = plot_va_vs_eta_by_N(
+        args.output,
+        scenario=scenario,
+        N_values=N_values,
+        etas=etas,
+        steps=args.steps,
+        seed=args.seed,
+        L=args.L,
+    )
+    print(result)
     return 0
 
 

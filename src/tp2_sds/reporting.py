@@ -10,7 +10,7 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 
-from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs, compute_va_series, discover_run_directories
+from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs, compute_va_series, discover_run_directories, stationary_window
 from .config import (
     DEFAULT_DT,
     DEFAULT_L,
@@ -25,11 +25,14 @@ from .config import (
     make_simulation_config,
 )
 from .io_extxyz import iter_extxyz
-from .simulation import LEADER_TYPE, write_simulation_run
+from .simulation import LEADER_TYPE, TAU, simulate_trajectory, write_simulation_run
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+from matplotlib.cm import get_cmap
+
+LEADER_MAGENTA = "#CC00CC"
 
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
@@ -181,6 +184,17 @@ def generate_results(
         seed = selection.record.config.seed
         gif_name = f"animation_{selection.scenario}_{selection.role}_eta{eta_tag}_seed{seed}"
         animate_trajectory(selection.record.trajectory_path, results_directory / gif_name)
+
+    for selection in selections:
+        if selection.role == "low_noise":
+            eta_tag = format_eta(selection.record.config.eta)
+            seed = selection.record.config.seed
+            viz_name = f"visualization_{selection.scenario}_eta{eta_tag}_seed{seed}"
+            plot_visualization_figure(
+                selection.record.trajectory_path,
+                results_directory / viz_name,
+                eta=selection.record.config.eta,
+            )
 
     return results_directory
 
@@ -369,6 +383,80 @@ def _plot_eta_vs_va_comparison(
     _save_figure(figure, results_directory / "eta_vs_va_comparison")
 
 
+def compute_va_mean_inline(
+    config: SimulationConfig,
+    transient_fraction: float = DEFAULT_TRANSIENT_FRACTION,
+) -> float:
+    """Run a simulation in memory and return stationary va_mean without writing to disk."""
+    frames = simulate_trajectory(config)
+    n_frames = len(frames)
+    t_start, t_end = stationary_window(n_frames, transient_fraction)
+    va_values = []
+    for frame in frames[t_start: t_end + 1]:
+        collective = np.linalg.norm(frame.velocities[:, :2].sum(axis=0))
+        n_particles = frame.velocities.shape[0]
+        va_values.append(collective / (n_particles * config.v))
+    return float(np.mean(va_values))
+
+
+def plot_va_vs_eta_by_N(
+    output_path: Path,
+    *,
+    scenario: str = "A",
+    N_values: tuple[int, ...] = (40, 100, 400),
+    etas: tuple[float, ...] | None = None,
+    steps: int = 2000,
+    seed: int = 1,
+    L: float | None = None,
+) -> Path:
+    """Generate va vs η plot for different N values (replicates Vicsek 1995 Fig. 1a)."""
+    if etas is None:
+        etas = tuple(i * 0.25 for i in range(21))  # 0.0 to 5.0 step 0.25
+
+    markers = ["o", "s", "^", "D", "v", "P", "*", "X"]
+    figure, axis = plt.subplots(figsize=(7, 5))
+
+    for idx, N in enumerate(sorted(N_values)):
+        # Compute L from N to keep density constant (rho = N / L^2)
+        if L is not None:
+            box_L = L
+        else:
+            box_L = np.sqrt(N / DEFAULT_RHO)
+        means = []
+        for eta in etas:
+            config = make_simulation_config(
+                scenario=scenario,
+                eta=eta,
+                steps=steps,
+                seed=seed,
+                L=box_L,
+                rho=None,
+                N=N,
+            )
+            va_mean = compute_va_mean_inline(config)
+            means.append(va_mean)
+            print(f"  N={N}, η={eta:.2f} → va={va_mean:.4f}")
+
+        marker = markers[idx % len(markers)]
+        axis.plot(
+            etas, means,
+            marker=marker, markersize=4, linewidth=1.0,
+            label=f"N={N}",
+        )
+
+    axis.set_xlabel(r"$\eta$", fontsize=12)
+    axis.set_ylabel(r"$v_a$", fontsize=12)
+    axis.set_title(f"Escenario {scenario}: $v_a$ vs $\\eta$ para distintos N")
+    axis.set_ylim(-0.05, 1.05)
+    axis.set_xlim(left=0)
+    axis.legend()
+    axis.grid(True, alpha=0.3)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    _save_figure(figure, output_path)
+    return output_path.with_suffix(".png")
+
+
 def _run_is_complete(run_directory: Path) -> bool:
     return (run_directory / "run.json").exists() and (run_directory / "trajectory.extxyz").exists()
 
@@ -383,7 +471,7 @@ def animate_trajectory(
     arrow_scale: float = 2.0,
     dpi: int = 150,
 ) -> Path:
-    from .simulation import _BLUE_GRADIENT, TAU
+    from .simulation import _hsv_to_rgb
 
     frames: list[dict] = []
     for i, frame in enumerate(iter_extxyz(trajectory_path)):
@@ -395,12 +483,8 @@ def animate_trajectory(
         leader_mask = frame.types == LEADER_TYPE
         normal_mask = ~leader_mask
         angles = np.arctan2(frame.velocities[:, 1], frame.velocities[:, 0])
-        t = (angles % TAU) / TAU
-        n_stops = len(_BLUE_GRADIENT)
-        scaled = t * n_stops
-        seg = np.floor(scaled).astype(int) % n_stops
-        frac = scaled - np.floor(scaled)
-        colors = _BLUE_GRADIENT[seg] + (_BLUE_GRADIENT[(seg + 1) % n_stops] - _BLUE_GRADIENT[seg]) * frac[:, np.newaxis]
+        hue = (angles % TAU) / TAU
+        colors = _hsv_to_rgb(hue)
         frames.append({
             "x": frame.positions[:, 0].copy(),
             "y": frame.positions[:, 1].copy(),
@@ -437,7 +521,7 @@ def animate_trajectory(
     if lm.any():
         quiver_leader = axis.quiver(
             f0["x"][lm], f0["y"][lm], f0["u"][lm], f0["v"][lm],
-            color="#ff0000", edgecolor="white", linewidth=1.0,
+            color=LEADER_MAGENTA, edgecolor="white", linewidth=1.0,
             angles="xy", scale_units="xy", scale=arrow_scale * 0.7,
             width=0.010, headwidth=3, headlength=4, zorder=10,
         )
@@ -460,6 +544,148 @@ def animate_trajectory(
     animation.save(str(gif_path), writer=PillowWriter(fps=fps), dpi=dpi)
     plt.close(figure)
     return gif_path
+
+
+def plot_visualization_figure(
+    trajectory_path: Path,
+    output_path: Path,
+    *,
+    frame_index: int = -1,
+    eta: float | None = None,
+    dpi: int = 200,
+) -> Path:
+    from collections import deque
+
+    if frame_index == -1:
+        frame = deque(iter_extxyz(trajectory_path), maxlen=1).pop()
+    else:
+        for i, f in enumerate(iter_extxyz(trajectory_path)):
+            if i == frame_index:
+                frame = f
+                break
+        else:
+            raise ValueError(f"Frame index {frame_index} not found in {trajectory_path}")
+
+    box_length = frame.lattice[0]
+    leader_mask = frame.types == LEADER_TYPE
+    normal_mask = ~leader_mask
+    angles = np.arctan2(frame.velocities[:, 1], frame.velocities[:, 0])
+    hsv_cmap = get_cmap("hsv")
+    colors = hsv_cmap((angles % TAU) / TAU)
+
+    N_particles = int(frame.ids.shape[0])
+    L = box_length
+
+    figure = plt.figure(figsize=(12, 7), facecolor="white")
+    gs = figure.add_gridspec(1, 2, width_ratios=[3, 1.3], wspace=0.3)
+    ax_main = figure.add_subplot(gs[0, 0])
+    ax_wheel = figure.add_subplot(gs[0, 1], projection="polar")
+
+    figure.suptitle(
+        "VISUALIZATION OF SELF-PROPELLED PARTICLE FLOCKING (VICSEK MODEL)",
+        fontsize=13,
+        fontweight="bold",
+        y=0.97,
+    )
+
+    eta_str = f"{eta:.1f}" if eta is not None else "?"
+    ax_main.set_title(
+        f"Simulation Parameters: (N={N_particles}, L={L:.0f}, \u03b7={eta_str})",
+        fontsize=10,
+        pad=8,
+    )
+
+    # --- Main panel ---
+    ax_main.set_facecolor("white")
+    ax_main.set_aspect("equal")
+    ax_main.set_xlim(0, L)
+    ax_main.set_ylim(0, L)
+    ax_main.set_xticks([])
+    ax_main.set_yticks([])
+    for spine in ax_main.spines.values():
+        spine.set_linewidth(2)
+        spine.set_color("black")
+
+    u = np.cos(angles)
+    v_arr = np.sin(angles)
+
+    if normal_mask.any():
+        ax_main.quiver(
+            frame.positions[normal_mask, 0],
+            frame.positions[normal_mask, 1],
+            u[normal_mask],
+            v_arr[normal_mask],
+            color=colors[normal_mask],
+            angles="xy",
+            scale_units="xy",
+            scale=2.5,
+            width=0.005,
+            headwidth=3,
+            headlength=4,
+        )
+
+    if leader_mask.any():
+        ax_main.quiver(
+            frame.positions[leader_mask, 0],
+            frame.positions[leader_mask, 1],
+            u[leader_mask],
+            v_arr[leader_mask],
+            color=LEADER_MAGENTA,
+            edgecolor="black",
+            linewidth=1.0,
+            angles="xy",
+            scale_units="xy",
+            scale=2.5 * 0.55,
+            width=0.012,
+            headwidth=3,
+            headlength=4,
+            zorder=10,
+        )
+        lx = float(frame.positions[leader_mask, 0][0])
+        ly = float(frame.positions[leader_mask, 1][0])
+        ax_main.annotate(
+            "Leader Agent\n(Fixed Unique Color)",
+            xy=(lx, ly),
+            xytext=(lx + L * 0.15, ly + L * 0.15),
+            fontsize=8,
+            fontweight="bold",
+            ha="center",
+            arrowprops=dict(arrowstyle="->", color="black", lw=1.5),
+            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=1),
+        )
+
+    # --- Color wheel panel ---
+    theta_wheel = np.linspace(0, TAU, 256)
+    r_wheel = np.linspace(0, 1, 2)
+    theta_grid, r_grid = np.meshgrid(theta_wheel, r_wheel)
+    color_values = theta_grid / TAU
+    ax_wheel.pcolormesh(theta_grid, r_grid, color_values, cmap="hsv", shading="auto")
+    ax_wheel.set_yticks([])
+    ax_wheel.set_xticks([0, np.pi / 2, np.pi, 3 * np.pi / 2])
+    ax_wheel.set_xticklabels(["0 / 2\u03c0", "\u03c0/2", "\u03c0", "3\u03c0/2"], fontsize=8)
+
+    n_arrows = 12
+    for i in range(n_arrows):
+        a = i * TAU / n_arrows
+        c = hsv_cmap(a / TAU)
+        ax_wheel.annotate(
+            "",
+            xy=(a, 0.85),
+            xytext=(a, 0.45),
+            arrowprops=dict(arrowstyle="->", color=c, lw=2),
+        )
+
+    ax_wheel.set_title(
+        "Cyclicalization for\nDirection to Color\n(0 a 2\u03c0 radians)",
+        fontsize=9,
+        pad=12,
+    )
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    figure.savefig(output_path.with_suffix(".png"), dpi=dpi, bbox_inches="tight")
+    figure.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
+    plt.close(figure)
+    return output_path.with_suffix(".png")
 
 
 def _save_figure(figure: plt.Figure, base_path: Path) -> None:
