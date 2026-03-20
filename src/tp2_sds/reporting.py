@@ -53,7 +53,7 @@ def _break_periodic_trail(
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
 DEFAULT_CAMPAIGN_SEEDS = (1, 2, 3, 4, 5)
-DEFAULT_CAMPAIGN_STEPS = 5000
+DEFAULT_CAMPAIGN_STEPS = 400
 RESULTS_DIRECTORY_NAME = "results"
 DEMO_MANIFEST_NAME = "demo_manifest.csv"
 
@@ -421,7 +421,7 @@ def plot_va_vs_eta_by_N(
     scenario: str = "A",
     N_values: tuple[int, ...] = (40, 100, 400, 4000),
     etas: tuple[float, ...] | None = None,
-    steps: int = 5000,
+    steps: int = 400,
     seed: int = 1,
     seeds: tuple[int, ...] | None = None,
     L: float | None = None,
@@ -495,7 +495,7 @@ def plot_va_timeseries_by_eta(
     scenario: str = "A",
     N: int = 300,
     etas: tuple[float, ...] = (0.0, 0.2, 0.6, 1.2, 2.4, 3.0, 5.2),
-    steps: int = 1000,
+    steps: int = 400,
     seed: int = 1,
     L: float | None = None,
 ) -> Path:

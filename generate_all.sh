@@ -8,7 +8,7 @@
 # Parámetros alineados al enunciado: L=10, ρ=4, v=0.03, r=1, dt=1.
 #
 # Variables de entorno para override:
-#   STEPS=5000          Pasos de simulación
+#   STEPS=400           Pasos de simulación
 #   SEEDS=1,2,3,4,5     Seeds para promedios
 #   ETAS=0.0,0.5,...     Valores de η
 #   RUNS_BASE=outputs    Directorio base de corridas
@@ -31,7 +31,7 @@ run_cli() { tp2-sds "$@"; }
 
 # ─── Parámetros ──────────────────────────────────────────────────────────────
 L=10
-STEPS="${STEPS:-5000}"
+STEPS="${STEPS:-400}"
 SEEDS="${SEEDS:-1,2,3,4,5}"
 ETAS="${ETAS:-0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0}"
 RUNS_BASE="${RUNS_BASE:-outputs}"
