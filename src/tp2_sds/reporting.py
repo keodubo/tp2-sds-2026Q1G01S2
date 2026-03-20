@@ -53,7 +53,7 @@ def _break_periodic_trail(
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
 DEFAULT_CAMPAIGN_SEEDS = (1, 2, 3, 4, 5)
-DEFAULT_CAMPAIGN_STEPS = 2000
+DEFAULT_CAMPAIGN_STEPS = 5000
 RESULTS_DIRECTORY_NAME = "results"
 DEMO_MANIFEST_NAME = "demo_manifest.csv"
 
@@ -421,7 +421,7 @@ def plot_va_vs_eta_by_N(
     scenario: str = "A",
     N_values: tuple[int, ...] = (40, 100, 400, 4000),
     etas: tuple[float, ...] | None = None,
-    steps: int = 2000,
+    steps: int = 5000,
     seed: int = 1,
     seeds: tuple[int, ...] | None = None,
     L: float | None = None,
@@ -482,6 +482,59 @@ def plot_va_vs_eta_by_N(
     axis.set_ylim(-0.05, 1.05)
     axis.set_xlim(left=0)
     axis.legend()
+    axis.grid(True, alpha=0.3)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    _save_figure(figure, output_path)
+    return output_path.with_suffix(".png")
+
+
+def plot_va_timeseries_by_eta(
+    output_path: Path,
+    *,
+    scenario: str = "A",
+    N: int = 300,
+    etas: tuple[float, ...] = (0.0, 0.2, 0.6, 1.2, 2.4, 3.0, 5.2),
+    steps: int = 1000,
+    seed: int = 1,
+    L: float | None = None,
+) -> Path:
+    """Generate polarisation vs time plot for different eta values."""
+    if L is None:
+        box_L = np.sqrt(N / DEFAULT_RHO)
+    else:
+        box_L = L
+
+    figure, axis = plt.subplots(figsize=(10, 6))
+
+    for eta in sorted(etas):
+        config = make_simulation_config(
+            scenario=scenario,
+            eta=eta,
+            steps=steps,
+            seed=seed,
+            L=box_L,
+            rho=None,
+            N=N,
+        )
+        frames = simulate_trajectory(config)
+        times = []
+        va_values = []
+        for frame in frames:
+            collective = np.linalg.norm(frame.velocities[:, :2].sum(axis=0))
+            n_particles = frame.velocities.shape[0]
+            va = collective / (n_particles * config.v)
+            times.append(frame.time)
+            va_values.append(va)
+        axis.plot(times, va_values, linewidth=0.8, label=f"η = {eta}")
+        print(f"  η={eta:.1f} done ({steps} steps)")
+
+    axis.set_xlabel("Tiempo (s)", fontsize=12)
+    axis.set_ylabel("Polarización", fontsize=12)
+    axis.set_title(f"Escenario {scenario}: Polarización vs tiempo (N={N})")
+    axis.set_ylim(-0.05, 1.05)
+    axis.set_xlim(left=0)
+    axis.legend(loc="center right")
     axis.grid(True, alpha=0.3)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)

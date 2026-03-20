@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import csv
+import re
 import shutil
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -21,6 +23,9 @@ REQUIRED_FIGURE_BASENAMES = (
     "eta_vs_va_comparison",
 )
 
+CODE_ZIP_INCLUDES = ("src", "tests", "pyproject.toml", "README.md", "generate_all.sh")
+CODE_ZIP_EXCLUDES = ("__pycache__", ".egg-info")
+
 
 @dataclass(frozen=True)
 class PackageResult:
@@ -29,7 +34,11 @@ class PackageResult:
     packaged_assets: int
 
 
-def package_deliverables(runs_root: Path, out_dir: Path | None = None) -> PackageResult:
+def package_deliverables(
+    runs_root: Path,
+    out_dir: Path | None = None,
+    extra_runs_roots: list[Path] | None = None,
+) -> PackageResult:
     results_dir = runs_root / RESULTS_DIRECTORY_NAME
     aggregate_path = runs_root / "aggregate.csv"
     manifest_path = results_dir / DEMO_MANIFEST_NAME
@@ -44,16 +53,59 @@ def package_deliverables(runs_root: Path, out_dir: Path | None = None) -> Packag
         shutil.copy2(path, assets_dir / path.name)
         packaged_assets += 1
 
+    extra_densities = _package_extra_densities(assets_dir, extra_runs_roots or [])
+    packaged_assets += extra_densities
+
     aggregate_rows = _read_csv_rows(aggregate_path)
     manifest_rows = _read_csv_rows(manifest_path)
+
+    has_rho2 = (assets_dir / "eta_vs_va_comparison_rho2.png").exists()
+    has_rho8 = (assets_dir / "eta_vs_va_comparison_rho8.png").exists()
 
     _write_scenario_summary(out_dir / "scenario_summary.csv", aggregate_rows, manifest_rows)
     _write_ovito_demo_guide(out_dir / "ovito_demo_guide.md", manifest_rows)
     _write_delivery_checklist(out_dir / "delivery_checklist.md")
-    _write_presentation_template(out_dir / "presentation_template.tex")
-    _write_report_template(out_dir / "report_template.tex")
+    _write_presentation_template(
+        out_dir / f"{DELIVERABLE_PREFIX}_Presentacion.tex",
+        has_rho2=has_rho2,
+        has_rho8=has_rho8,
+    )
+    _write_report_template(
+        out_dir / f"{DELIVERABLE_PREFIX}_Informe.tex",
+        has_rho2=has_rho2,
+        has_rho8=has_rho8,
+    )
+    _create_code_zip(out_dir)
 
     return PackageResult(out_dir=out_dir, assets_dir=assets_dir, packaged_assets=packaged_assets)
+
+
+def _package_extra_densities(assets_dir: Path, extra_roots: list[Path]) -> int:
+    """Copy comparison figures and manifests from extra density runs."""
+    packaged = 0
+    for root in extra_roots:
+        rho_tag = _extract_rho_tag(root)
+        if rho_tag is None:
+            continue
+        results_dir = root / RESULTS_DIRECTORY_NAME
+        for suffix in (".png", ".pdf"):
+            src = results_dir / f"eta_vs_va_comparison{suffix}"
+            if src.exists():
+                shutil.copy2(src, assets_dir / f"eta_vs_va_comparison_{rho_tag}{suffix}")
+                packaged += 1
+        manifest_src = results_dir / DEMO_MANIFEST_NAME
+        if manifest_src.exists():
+            shutil.copy2(manifest_src, assets_dir / f"demo_manifest_{rho_tag}.csv")
+            packaged += 1
+    return packaged
+
+
+def _extract_rho_tag(root: Path) -> str | None:
+    """Extract rho tag from directory name like 'rho=2' → 'rho2'."""
+    match = re.search(r"rho[=_](\d+)", root.name)
+    if match:
+        return f"rho{match.group(1)}"
+    return None
 
 
 def _validate_required_inputs(
@@ -206,7 +258,28 @@ def _write_delivery_checklist(path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def _write_presentation_template(path: Path) -> None:
+def _write_presentation_template(path: Path, *, has_rho2: bool = False, has_rho8: bool = False) -> None:
+    optional_frames = ""
+    if has_rho2 or has_rho8:
+        parts = []
+        if has_rho2:
+            parts.append(r"""
+\begin{frame}{Densidad extra: $\rho = 2$}
+\includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison_rho2.pdf}
+
+\vspace{0.5em}
+\small Elegir como maximo 2 demos (bajo y alto ruido). Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
+\end{frame}""")
+        if has_rho8:
+            parts.append(r"""
+\begin{frame}{Densidad extra: $\rho = 8$}
+\includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison_rho8.pdf}
+
+\vspace{0.5em}
+\small Elegir como maximo 2 demos (bajo y alto ruido). Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
+\end{frame}""")
+        optional_frames = "\n".join(parts)
+
     template = r"""\documentclass{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -269,14 +342,7 @@ Detallar rango de ruido, cantidad de seeds, steps y criterio de estado estaciona
 \begin{frame}{Comparacion final}
 \includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison.pdf}
 \end{frame}
-
-\begin{frame}{Opcionales: otras densidades}
-\begin{itemize}
-\item Si se incluyen los opcionales, insertar una figura comparativa para \texttt{rho=2}.
-\item Insertar hasta dos fotogramas o links de demo para \texttt{rho=2}.
-\item Repetir lo mismo para \texttt{rho=8}.
-\end{itemize}
-\end{frame}
+""" + optional_frames + r"""
 
 \section{Conclusiones}
 \begin{frame}{Conclusiones}
@@ -292,7 +358,31 @@ Detallar rango de ruido, cantidad de seeds, steps y criterio de estado estaciona
     path.write_text(template + "\n", encoding="utf-8")
 
 
-def _write_report_template(path: Path) -> None:
+def _write_report_template(path: Path, *, has_rho2: bool = False, has_rho8: bool = False) -> None:
+    optional_sections = ""
+    if has_rho2 or has_rho8:
+        parts = [r"\subsection{Densidades extra (opcional)}"]
+        if has_rho2:
+            parts.append(r"""
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/eta_vs_va_comparison_rho2.pdf}
+\caption{Comparacion entre escenarios para $\rho = 2$.}
+\end{figure}
+Incluir como maximo dos capturas fijas de demos representativas para $\rho = 2$ (bajo y alto ruido).""")
+        if has_rho8:
+            parts.append(r"""
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/eta_vs_va_comparison_rho8.pdf}
+\caption{Comparacion entre escenarios para $\rho = 8$.}
+\end{figure}
+Incluir como maximo dos capturas fijas de demos representativas para $\rho = 8$ (bajo y alto ruido).""")
+        optional_sections = "\n".join(parts)
+    else:
+        optional_sections = r"""\subsection{Opcional: densidades extra}
+Si se incluyen los casos opcionales, agregar una subseccion para \texttt{rho=2} y otra para \texttt{rho=8}. Cada una debe mostrar una figura comparativa entre escenarios y, como maximo, dos capturas fijas de demos representativas."""
+
     template = r"""\documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -350,8 +440,7 @@ Detallar parametros fijos, rango de $\eta$, cantidad de seeds, cantidad de pasos
 \caption{Comparacion final entre los tres escenarios obligatorios.}
 \end{figure}
 
-\subsection{Opcional: densidades extra}
-Si se incluyen los casos opcionales, agregar una subseccion para \texttt{rho=2} y otra para \texttt{rho=8}. Cada una debe mostrar una figura comparativa entre escenarios y, como maximo, dos capturas fijas de demos representativas.
+""" + optional_sections + r"""
 
 \section{Conclusiones}
 Concluir solo a partir de las figuras y resultados incluidos arriba.
@@ -362,3 +451,21 @@ Agregar aqui la referencia al articulo de Vicsek y cualquier otra fuente citada 
 \end{document}
 """
     path.write_text(template + "\n", encoding="utf-8")
+
+
+def _create_code_zip(out_dir: Path) -> Path:
+    """Create the source code ZIP with only the allowed files."""
+    project_root = Path(__file__).resolve().parent.parent.parent
+    zip_path = out_dir / f"{DELIVERABLE_PREFIX}_Codigo.zip"
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for include in CODE_ZIP_INCLUDES:
+            source = project_root / include
+            if source.is_file():
+                zf.write(source, include)
+            elif source.is_dir():
+                for file_path in sorted(source.rglob("*")):
+                    if file_path.is_file() and not any(exc in str(file_path) for exc in CODE_ZIP_EXCLUDES):
+                        zf.write(file_path, str(file_path.relative_to(project_root)))
+
+    return zip_path

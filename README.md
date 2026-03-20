@@ -4,7 +4,7 @@ Simulación de dinámica de partículas autopropulsadas (modelo de Vicsek) con t
 
 - **A**: sin líder
 - **B**: líder con dirección fija
-- **C**: líder con dirección variable
+- **C**: líder con trayectoria circular (R=5)
 
 ## Requisitos
 
@@ -16,97 +16,178 @@ Simulación de dinámica de partículas autopropulsadas (modelo de Vicsek) con t
 python3 -m pip install -e ".[dev]"
 ```
 
-## Estructura de salidas
+## Parámetros del enunciado
 
-```
-outputs/                          ← trayectorias de simulación
-  scenario=A/eta=0.100000/seed=42/
-    run.json                      ← configuración de la corrida
-    trajectory.extxyz             ← trayectoria multi-frame
+| Parámetro | Valor   | Descripción                         |
+|-----------|---------|-------------------------------------|
+| L         | 10      | Tamaño de la caja                   |
+| ρ         | 4       | Densidad (→ N=400)                  |
+| v         | 0.03    | Velocidad de las partículas         |
+| r         | 1       | Radio de interacción                |
+| dt        | 1       | Paso temporal                       |
+| η         | 0.0–5.0 | Ruido (barrido en pasos de 0.5)     |
+| seeds     | 1–5     | Realizaciones para promedio y error  |
+| steps     | 5000    | Pasos de simulación                 |
 
-results/                          ← figuras y animaciones generadas
-  viz_A.png, viz_B.png, viz_C.png
-  anim_A.gif, anim_B.gif, anim_C.gif
-  va_vs_eta_by_N_A.png, ...
-```
+## Generar los entregables
 
-## Uso: comandos individuales
-
-Todos los comandos se ejecutan con `tp2-sds` (si se instaló el paquete) o con `PYTHONPATH=src python3 -m tp2_sds.cli`.
-
-### Simular una corrida
-
-```bash
-tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 2000 --N 300 --L 25
-```
-
-Parámetros principales:
-
-| Parámetro     | Descripción                          | Default |
-|---------------|--------------------------------------|---------|
-| `--scenario`  | Escenario: A, B o C                  | —       |
-| `--eta`       | Nivel de ruido                       | —       |
-| `--seed`      | Semilla para reproducibilidad        | —       |
-| `--steps`     | Cantidad de pasos de simulación      | —       |
-| `--N`         | Cantidad de partículas               | —       |
-| `--L`         | Tamaño de la caja                    | 10.0    |
-| `--force`     | Sobreescribir corrida existente      | false   |
-
-La trayectoria se guarda en `outputs/scenario=<X>/eta=<Y>/seed=<Z>/trajectory.extxyz`.
-
-### Generar una animación GIF
-
-A partir de una trayectoria ya simulada:
-
-```bash
-tp2-sds animate outputs/scenario=A/eta=0.100000/seed=42/trajectory.extxyz --output results/anim_A
-```
-
-Opciones: `--frame-step` (default 10), `--fps` (default 20), `--arrow-scale` (default 2.0), `--dpi` (default 150).
-
-### Generar una figura estática (HSV)
-
-```bash
-tp2-sds visualize --trajectory outputs/scenario=A/eta=0.100000/seed=42/trajectory.extxyz --eta 0.1 --output results/viz_A
-```
-
-También puede simular y visualizar en un solo paso (sin trayectoria previa):
-
-```bash
-tp2-sds visualize --scenario B --eta 0.1 --N 300 --L 25 --steps 2000 --seed 42 --output results/viz_B
-```
-
-### Generar gráfico va vs eta (sweep)
-
-Barrido de alineación para distintos N:
-
-```bash
-tp2-sds sweep --scenario A --N-values 40,100,400,4000 --etas 0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0 --steps 2000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
-```
-
-### Batch de simulaciones
-
-```bash
-tp2-sds batch --scenarios A,B,C --etas 0.1,0.5,2.0 --seeds 1,2,3 --steps 2000
-```
-
-## Generar todo de una vez
-
-El script `generate_all.sh` ejecuta todas las simulaciones, visualizaciones, animaciones y sweeps:
+El script `generate_all.sh` ejecuta el pipeline completo: campañas de simulación para ρ=4 (obligatorio) y ρ=2, ρ=8 (opcionales), análisis, generación de figuras, y armado del bundle de entregables.
 
 ```bash
 chmod +x generate_all.sh
 ./generate_all.sh
 ```
 
-Este script realiza los siguientes pasos:
+**Pasos del pipeline**:
 
-1. **Simulaciones**: corre los escenarios A, B y C con eta bajo (0.1) y alto (2.0), N=300, L=25, 2000 pasos.
-2. **Figuras estáticas**: genera `results/viz_A.png`, `viz_B.png`, `viz_C.png` a partir de las trayectorias con eta bajo.
-3. **Animaciones GIF**: genera `results/anim_A.gif`, `anim_B.gif`, `anim_C.gif`.
-4. **Sweeps va vs eta**: genera gráficos de alineación vs ruido para N = 40, 100, 400 y 4000 con 10 seeds, para cada escenario.
+1. **Campaña ρ=4** (obligatoria): simula A/B/C × 11 etas × 5 seeds = 165 corridas, analiza y genera figuras.
+2. **Campaña ρ=2** (opcional): ídem con N=200.
+3. **Campaña ρ=8** (opcional): ídem con N=800.
+4. **Packaging**: valida resultados, copia assets, genera templates .tex, arma ZIP de código.
+5. **Aliases legacy**: copia visualizaciones y animaciones low-noise a `results/`.
 
-Los resultados quedan en la carpeta `results/`.
+**Variables de entorno para override**:
+
+```bash
+# Corrida rápida para test:
+STEPS=50 SEEDS=1,2 ETAS=0.0,2.5,5.0 ./generate_all.sh
+
+# Saltar densidades opcionales:
+SKIP_OPTIONAL=1 ./generate_all.sh
+
+# Forzar recálculo (no skip-existing):
+FORCE_REBUILD=1 ./generate_all.sh
+```
+
+| Variable           | Default                           | Descripción                        |
+|--------------------|-----------------------------------|------------------------------------|
+| `STEPS`            | 5000                              | Pasos de simulación                |
+| `SEEDS`            | 1,2,3,4,5                         | Seeds para promedios               |
+| `ETAS`             | 0.0,0.5,...,5.0                   | Valores de η                       |
+| `RUNS_BASE`        | outputs                           | Directorio base de corridas        |
+| `DELIVERABLES_DIR` | deliverables                      | Directorio de salida del bundle    |
+| `FORCE_REBUILD`    | 0                                 | Forzar recálculo                   |
+| `SKIP_OPTIONAL`    | 0                                 | Saltar ρ=2 y ρ=8                   |
+
+## Estructura de salidas
+
+```
+outputs/
+  rho=4/                              ← campaña obligatoria
+    scenario=A/eta=0.000000/seed=1/
+      run.json
+      trajectory.extxyz
+    ...
+    aggregate.csv                      ← promedios por (escenario, η)
+    results/
+      eta_vs_va_A.{png,pdf}           ← va vs η por escenario
+      eta_vs_va_B.{png,pdf}
+      eta_vs_va_C.{png,pdf}
+      eta_vs_va_comparison.{png,pdf}   ← comparación de los 3 escenarios
+      va_timeseries_A.{png,pdf}        ← evolución temporal de va
+      va_timeseries_B.{png,pdf}
+      va_timeseries_C.{png,pdf}
+      visualization_*.{png,pdf}        ← figuras estáticas HSV
+      animation_*.gif                  ← animaciones con flechas coloreadas
+      demo_manifest.csv
+  rho=2/                              ← campaña opcional
+  rho=8/                              ← campaña opcional
+
+deliverables/                          ← bundle de entrega
+  assets/
+    aggregate.csv
+    demo_manifest.csv
+    va_timeseries_{A,B,C}.{png,pdf}
+    eta_vs_va_{A,B,C}.{png,pdf}
+    eta_vs_va_comparison.{png,pdf}
+    eta_vs_va_comparison_rho2.{png,pdf}  (si --extra-runs-roots)
+    eta_vs_va_comparison_rho8.{png,pdf}  (si --extra-runs-roots)
+  scenario_summary.csv
+  ovito_demo_guide.md
+  delivery_checklist.md
+  SdS_TP2_2026Q1G01S2_Presentacion.tex
+  SdS_TP2_2026Q1G01S2_Informe.tex
+  SdS_TP2_2026Q1G01S2_Codigo.zip
+```
+
+## Comandos CLI
+
+Todos los comandos se ejecutan con `tp2-sds`.
+
+### campaign
+
+Ejecuta batch de simulaciones + análisis + generación de figuras:
+
+```bash
+tp2-sds campaign --runs-root outputs/rho=4 --L 10 --rho 4 --steps 5000 \
+  --seeds 1,2,3,4,5 --etas 0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0 \
+  --skip-existing
+```
+
+### package
+
+Valida resultados y arma bundle de entregables:
+
+```bash
+tp2-sds package --runs-root outputs/rho=4 --out-dir deliverables \
+  --extra-runs-roots outputs/rho=2,outputs/rho=8
+```
+
+### simulate
+
+Genera una corrida individual:
+
+```bash
+tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 5000 --L 10 --rho 4
+```
+
+### batch
+
+Producto cartesiano de corridas:
+
+```bash
+tp2-sds batch --scenarios A,B,C --etas 0.1,0.5,2.0 --seeds 1,2,3 --steps 5000 --skip-existing
+```
+
+### analyze
+
+Analiza corridas existentes y genera `aggregate.csv`:
+
+```bash
+tp2-sds analyze --runs-root outputs/rho=4
+```
+
+### animate
+
+Genera animación GIF desde una trayectoria:
+
+```bash
+tp2-sds animate outputs/rho=4/scenario=A/eta=0.100000/seed=1/trajectory.extxyz --output results/anim_A
+```
+
+### visualize
+
+Genera figura estática HSV:
+
+```bash
+tp2-sds visualize --scenario B --eta 0.1 --N 400 --L 10 --steps 2000 --seed 42 --output results/viz_B
+```
+
+### sweep
+
+Barrido va vs η para distintos N:
+
+```bash
+tp2-sds sweep --scenario A --N-values 40,100,400 --steps 5000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
+```
+
+### timeseries
+
+Evolución temporal de va para múltiples η:
+
+```bash
+tp2-sds timeseries --scenario A --N 400 --etas 0.0,0.2,0.6,1.2,2.4,3.0,5.2 --steps 1000 --output results/va_timeseries
+```
 
 ## Tests
 

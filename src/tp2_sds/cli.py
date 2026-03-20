@@ -9,7 +9,7 @@ from typing import Sequence
 from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs
 from .config import DEFAULT_OUTPUTS_ROOT, DEFAULT_RHO, format_eta, make_simulation_config, normalize_scenario
 from .deliverables import package_deliverables
-from .reporting import CampaignSpec, animate_trajectory, default_campaign_spec, generate_results, plot_va_vs_eta_by_N, plot_visualization_figure, run_campaign
+from .reporting import CampaignSpec, animate_trajectory, default_campaign_spec, generate_results, plot_va_timeseries_by_eta, plot_va_vs_eta_by_N, plot_visualization_figure, run_campaign
 from .simulation import write_simulation_run
 
 
@@ -88,9 +88,20 @@ def build_parser() -> argparse.ArgumentParser:
     sweep_parser.add_argument("--output", type=Path, default=Path("/tmp/va_vs_eta_by_N"), help="Output path (without suffix)")
     sweep_parser.set_defaults(handler=_handle_sweep)
 
+    timeseries_parser = subparsers.add_parser("timeseries", help="Generate polarisation vs time plot for different eta values")
+    timeseries_parser.add_argument("--scenario", default="A", help="Scenario A, B, or C")
+    timeseries_parser.add_argument("--N", type=int, default=300, help="Number of particles")
+    timeseries_parser.add_argument("--etas", default="0.0,0.2,0.6,1.2,2.4,3.0,5.2", help="Comma-separated eta values")
+    timeseries_parser.add_argument("--steps", type=int, default=1000, help="Number of simulation steps")
+    timeseries_parser.add_argument("--seed", type=int, default=1)
+    timeseries_parser.add_argument("--L", type=float, default=None, help="Box size (default: computed from N and rho=4)")
+    timeseries_parser.add_argument("--output", type=Path, default=Path("/tmp/va_timeseries"), help="Output path (without suffix)")
+    timeseries_parser.set_defaults(handler=_handle_timeseries)
+
     package_parser = subparsers.add_parser("package", help="Validate results and assemble deliverable templates")
     package_parser.add_argument("--runs-root", type=Path, default=DEFAULT_OUTPUTS_ROOT)
     package_parser.add_argument("--out-dir", type=Path)
+    package_parser.add_argument("--extra-runs-roots", default=None, help="Comma-separated extra runs roots for optional densities, e.g. outputs/rho=2,outputs/rho=8")
     package_parser.set_defaults(handler=_handle_package)
     return parser
 
@@ -263,8 +274,27 @@ def _handle_sweep(args: argparse.Namespace) -> int:
     return 0
 
 
+def _handle_timeseries(args: argparse.Namespace) -> int:
+    etas = tuple(float(v) for v in _parse_csv(args.etas))
+    scenario = normalize_scenario(args.scenario)
+    result = plot_va_timeseries_by_eta(
+        args.output,
+        scenario=scenario,
+        N=args.N,
+        etas=etas,
+        steps=args.steps,
+        seed=args.seed,
+        L=args.L,
+    )
+    print(result)
+    return 0
+
+
 def _handle_package(args: argparse.Namespace) -> int:
-    result = package_deliverables(args.runs_root, out_dir=args.out_dir)
+    extra_roots = None
+    if args.extra_runs_roots:
+        extra_roots = [Path(p.strip()) for p in args.extra_runs_roots.split(",") if p.strip()]
+    result = package_deliverables(args.runs_root, out_dir=args.out_dir, extra_runs_roots=extra_roots)
     print(f"Packaged {result.packaged_assets} assets into {result.out_dir}")
     return 0
 

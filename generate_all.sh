@@ -1,106 +1,144 @@
 #!/usr/bin/env bash
 # =============================================================================
-# generate_all.sh — Genera todas las simulaciones, visualizaciones y gráficos
+# generate_all.sh — Pipeline completo de entrega del TP2
+#
+# Genera campañas para ρ=4 (obligatorio) y ρ=2, ρ=8 (opcionales),
+# luego arma el bundle de entregables en deliverables/.
+#
+# Parámetros alineados al enunciado: L=10, ρ=4, v=0.03, r=1, dt=1.
+#
+# Variables de entorno para override:
+#   STEPS=5000          Pasos de simulación
+#   SEEDS=1,2,3,4,5     Seeds para promedios
+#   ETAS=0.0,0.5,...     Valores de η
+#   RUNS_BASE=outputs    Directorio base de corridas
+#   DELIVERABLES_DIR=deliverables  Directorio de salida del bundle
+#   FORCE_REBUILD=1      Forzar recálculo (no skip-existing)
+#   SKIP_OPTIONAL=1      Saltar densidades opcionales ρ=2 y ρ=8
 #
 # Uso:
 #   chmod +x generate_all.sh
 #   ./generate_all.sh
 #
-# Outputs:
-#   results/viz_A.png, viz_B.png, viz_C.png                → figuras estáticas HSV
-#   results/anim_A.gif, anim_B.gif, anim_C.gif             → animaciones GIF
-#   results/va_vs_eta_by_N_A.png                           → va vs η distintos N
-#   results/va_vs_eta_by_N_B.png
-#   results/va_vs_eta_by_N_C.png
+#   # Corrida rápida para test:
+#   STEPS=50 SEEDS=1,2 ETAS=0.0,2.5,5.0 ./generate_all.sh
 # =============================================================================
 set -euo pipefail
 
 cd "$(dirname "$0")"
-export PYTHONPATH=src
 
-CLI="python3 -c 'from tp2_sds.cli import main; import sys; main(sys.argv[1:])'"
-run_cli() { python3 -c "from tp2_sds.cli import main; import sys; main(sys.argv[1:])" "$@"; }
+run_cli() { tp2-sds "$@"; }
+
+# ─── Parámetros ──────────────────────────────────────────────────────────────
+L=10
+STEPS="${STEPS:-5000}"
+SEEDS="${SEEDS:-1,2,3,4,5}"
+ETAS="${ETAS:-0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0}"
+RUNS_BASE="${RUNS_BASE:-outputs}"
+DELIVERABLES_DIR="${DELIVERABLES_DIR:-deliverables}"
+FORCE_REBUILD="${FORCE_REBUILD:-0}"
+SKIP_OPTIONAL="${SKIP_OPTIONAL:-0}"
+
+SKIP_FLAG=""
+if [ "$FORCE_REBUILD" != "1" ]; then
+    SKIP_FLAG="--skip-existing"
+fi
 
 RESULTS=results
 mkdir -p "$RESULTS"
 
-# ─── Parámetros ──────────────────────────────────────────────────────────────
-N=300
-L=25
-STEPS=2000
-SEED=42
-ETA_LOW=0.1       # ruido bajo  → estado ordenado (va ≈ 1)
-ETA_HIGH=2.0      # ruido alto  → estado desordenado (va ≈ 0)
-
+# =============================================================================
 echo "=============================================="
-echo " PASO 1: Simulaciones"
+echo " PASO 1: Campaña obligatoria ρ=4"
 echo "=============================================="
+RHO4_ROOT="${RUNS_BASE}/rho=4"
+run_cli campaign \
+    --runs-root "$RHO4_ROOT" \
+    --steps "$STEPS" \
+    --seeds "$SEEDS" \
+    --etas "$ETAS" \
+    --L "$L" --rho 4 \
+    $SKIP_FLAG
 
-for SCENARIO in A B C; do
-    for ETA in $ETA_LOW $ETA_HIGH; do
-        echo "→ Escenario $SCENARIO, η=$ETA ..."
-        run_cli simulate \
-            --scenario "$SCENARIO" --eta "$ETA" --seed "$SEED" \
-            --steps "$STEPS" --N "$N" --L "$L" --force
-    done
-done
-
-echo ""
-echo "=============================================="
-echo " PASO 2: Figuras estáticas HSV (visualize)"
-echo "=============================================="
-
-for SCENARIO in A B C; do
-    TRAJ="outputs/scenario=${SCENARIO}/eta=0.100000/seed=${SEED}/trajectory.extxyz"
-    echo "→ Visualización escenario $SCENARIO (η=$ETA_LOW) ..."
-    run_cli visualize \
-        --trajectory "$TRAJ" \
-        --eta "$ETA_LOW" \
-        --output "$RESULTS/viz_${SCENARIO}"
-done
-
-echo ""
-echo "=============================================="
-echo " PASO 2b: Animaciones GIF"
-echo "=============================================="
-
-for SCENARIO in A B C; do
-    TRAJ="outputs/scenario=${SCENARIO}/eta=0.100000/seed=${SEED}/trajectory.extxyz"
-    echo "→ Animación escenario $SCENARIO (η=$ETA_LOW) ..."
-    run_cli animate "$TRAJ" \
-        --output "$RESULTS/anim_${SCENARIO}"
-done
-
-echo ""
-echo "=============================================="
-echo " PASO 3: Gráficos va vs η para distintos N"
-echo "=============================================="
-
-SWEEP_N="40,100,400,4000"
-SWEEP_ETAS="0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0"
-SWEEP_SEEDS="1,2,3,4,5,6,7,8,9,10"
-
-for SCENARIO in A B C; do
-    echo "→ Sweep escenario $SCENARIO (N=$SWEEP_N, seeds=$SWEEP_SEEDS) ..."
-    run_cli sweep \
-        --scenario "$SCENARIO" \
-        --N-values "$SWEEP_N" \
-        --etas "$SWEEP_ETAS" \
+# =============================================================================
+if [ "$SKIP_OPTIONAL" != "1" ]; then
+    echo ""
+    echo "=============================================="
+    echo " PASO 2: Campaña opcional ρ=2"
+    echo "=============================================="
+    RHO2_ROOT="${RUNS_BASE}/rho=2"
+    run_cli campaign \
+        --runs-root "$RHO2_ROOT" \
         --steps "$STEPS" \
-        --seeds "$SWEEP_SEEDS" \
-        --output "$RESULTS/va_vs_eta_by_N_${SCENARIO}"
+        --seeds "$SEEDS" \
+        --etas "$ETAS" \
+        --L "$L" --rho 2 \
+        $SKIP_FLAG
+
+    echo ""
+    echo "=============================================="
+    echo " PASO 3: Campaña opcional ρ=8"
+    echo "=============================================="
+    RHO8_ROOT="${RUNS_BASE}/rho=8"
+    run_cli campaign \
+        --runs-root "$RHO8_ROOT" \
+        --steps "$STEPS" \
+        --seeds "$SEEDS" \
+        --etas "$ETAS" \
+        --L "$L" --rho 8 \
+        $SKIP_FLAG
+fi
+
+# =============================================================================
+echo ""
+echo "=============================================="
+echo " PASO 4: Packaging de entregables"
+echo "=============================================="
+
+EXTRA_ROOTS_FLAG=""
+if [ "$SKIP_OPTIONAL" != "1" ]; then
+    EXTRA_ROOTS_FLAG="--extra-runs-roots ${RUNS_BASE}/rho=2,${RUNS_BASE}/rho=8"
+fi
+
+run_cli package \
+    --runs-root "$RHO4_ROOT" \
+    --out-dir "$DELIVERABLES_DIR" \
+    $EXTRA_ROOTS_FLAG
+
+# =============================================================================
+echo ""
+echo "=============================================="
+echo " PASO 5: Aliases legacy en results/"
+echo "=============================================="
+
+# Copiar visualizaciones y animaciones low-noise de ρ=4 a results/ para compatibilidad
+RHO4_RESULTS="${RHO4_ROOT}/results"
+for SCENARIO in A B C; do
+    # Buscar visualización low-noise
+    VIZ=$(ls "${RHO4_RESULTS}"/visualization_${SCENARIO}_eta*.png 2>/dev/null | head -1 || true)
+    if [ -n "$VIZ" ]; then
+        cp "$VIZ" "${RESULTS}/viz_${SCENARIO}.png"
+        cp "${VIZ%.png}.pdf" "${RESULTS}/viz_${SCENARIO}.pdf" 2>/dev/null || true
+    fi
+    # Buscar animación low-noise
+    ANIM=$(ls "${RHO4_RESULTS}"/animation_${SCENARIO}_low_noise*.gif 2>/dev/null | head -1 || true)
+    if [ -n "$ANIM" ]; then
+        cp "$ANIM" "${RESULTS}/anim_${SCENARIO}.gif"
+    fi
 done
 
+# =============================================================================
 echo ""
 echo "=============================================="
 echo " LISTO"
 echo "=============================================="
 echo ""
-echo "Archivos generados:"
+echo "  Entregables en: ${DELIVERABLES_DIR}/"
+ls "$DELIVERABLES_DIR"/ 2>/dev/null | sed 's/^/    /'
 echo ""
-echo "  Figuras (PNG + PDF):"
-ls "$RESULTS"/*.png 2>/dev/null | sed 's/^/    /'
+echo "  Assets:"
+ls "$DELIVERABLES_DIR"/assets/ 2>/dev/null | sed 's/^/    /'
 echo ""
-echo "  Animaciones (GIF):"
-ls "$RESULTS"/*.gif 2>/dev/null | sed 's/^/    /'
+echo "  Aliases legacy en: ${RESULTS}/"
+ls "$RESULTS"/ 2>/dev/null | sed 's/^/    /'
 echo ""
