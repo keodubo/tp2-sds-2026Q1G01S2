@@ -26,10 +26,35 @@ Generar una corrida:
 tp2-sds simulate --scenario A --eta 0.150000 --seed 7 --steps 100
 ```
 
+Generar una animación GIF a partir de una trayectoria:
+
+```bash
+tp2-sds animate outputs/scenario=A/eta=0.150000/seed=7/trajectory.extxyz --output ./animacion_A
+```
+
+O si prefieres no usar el comando instalado, puedes ejecutar el módulo de Python directamente (ej. para otra prueba manual):
+
+```bash
+PYTHONPATH=src python3 -m tp2_sds.cli simulate --scenario B --eta 0.1 --seed 42 --steps 500 --N 100 --L 10.0 --output-root /tmp/tp2_sim_output
+PYTHONPATH=src python3 -m tp2_sds.cli animate /tmp/tp2_sim_output/scenario=B/eta=0.100000/seed=42/trajectory.extxyz --output ./mi_animacion_B
+```
+
+Abrir una trayectoria directamente en OVITO (macOS):
+
+```bash
+open -a Ovito outputs/scenario=A/eta=0.150000/seed=7/trajectory.extxyz
+```
+
 Generar un batch:
 
 ```bash
 tp2-sds batch --scenarios A,B,C --etas 0.1,0.5 --seeds 1,2,3 --steps 120
+```
+
+Generar un barrido (sweep) rápido para el gráfico de alineación ($V_a$) vs ruido ($\eta$):
+
+```bash
+tp2-sds sweep --scenario A --N-values 40,100,400 --output ./grafico_va_vs_eta
 ```
 
 Analizar corridas existentes:

@@ -70,17 +70,18 @@ echo "=============================================="
 echo " PASO 3: Gráficos va vs η para distintos N"
 echo "=============================================="
 
-SWEEP_N="40,100,400"
+SWEEP_N="40,100,400,4000"
 SWEEP_ETAS="0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0"
+SWEEP_SEEDS="1,2,3,4,5,6,7,8,9,10"
 
 for SCENARIO in A B C; do
-    echo "→ Sweep escenario $SCENARIO (N=$SWEEP_N) ..."
+    echo "→ Sweep escenario $SCENARIO (N=$SWEEP_N, seeds=$SWEEP_SEEDS) ..."
     run_cli sweep \
         --scenario "$SCENARIO" \
         --N-values "$SWEEP_N" \
         --etas "$SWEEP_ETAS" \
         --steps "$STEPS" \
-        --seed "$SEED" \
+        --seeds "$SWEEP_SEEDS" \
         --output "$RESULTS/va_vs_eta_by_N_${SCENARIO}"
 done
 

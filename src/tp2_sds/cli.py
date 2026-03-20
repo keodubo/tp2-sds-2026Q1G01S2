@@ -82,7 +82,8 @@ def build_parser() -> argparse.ArgumentParser:
     sweep_parser.add_argument("--N-values", default="40,100,400", help="Comma-separated N values")
     sweep_parser.add_argument("--etas", help="Comma-separated eta values (default 0.0..5.0 step 0.25)")
     sweep_parser.add_argument("--steps", type=int, default=2000)
-    sweep_parser.add_argument("--seed", type=int, default=1)
+    sweep_parser.add_argument("--seed", type=int, default=1, help="Single seed (ignored when --seeds is given)")
+    sweep_parser.add_argument("--seeds", default=None, help="Comma-separated seeds for multi-seed averaging, e.g. 1,2,3,4,5")
     sweep_parser.add_argument("--L", type=float, default=None, help="Box size (default: computed from N and rho=4)")
     sweep_parser.add_argument("--output", type=Path, default=Path("/tmp/va_vs_eta_by_N"), help="Output path (without suffix)")
     sweep_parser.set_defaults(handler=_handle_sweep)
@@ -246,6 +247,7 @@ def _handle_visualize(args: argparse.Namespace) -> int:
 def _handle_sweep(args: argparse.Namespace) -> int:
     N_values = tuple(int(v) for v in _parse_csv(args.N_values))
     etas = tuple(float(v) for v in _parse_csv(args.etas)) if args.etas else None
+    seeds = tuple(int(v) for v in _parse_csv(args.seeds)) if args.seeds else None
     scenario = normalize_scenario(args.scenario)
     result = plot_va_vs_eta_by_N(
         args.output,
@@ -254,6 +256,7 @@ def _handle_sweep(args: argparse.Namespace) -> int:
         etas=etas,
         steps=args.steps,
         seed=args.seed,
+        seeds=seeds,
         L=args.L,
     )
     print(result)

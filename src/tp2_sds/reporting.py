@@ -34,6 +34,22 @@ from matplotlib.cm import get_cmap
 
 LEADER_MAGENTA = "#CC00CC"
 
+
+def _break_periodic_trail(
+    x: np.ndarray, y: np.ndarray, box_length: float
+) -> tuple[np.ndarray, np.ndarray]:
+    """Insert NaN at periodic-boundary jumps so the plotted line breaks."""
+    x = x.astype(float).copy()
+    y = y.astype(float).copy()
+    half = box_length / 2.0
+    dx = np.abs(np.diff(x))
+    dy = np.abs(np.diff(y))
+    breaks = np.where((dx > half) | (dy > half))[0] + 1
+    if breaks.size:
+        x = np.insert(x, breaks, np.nan)
+        y = np.insert(y, breaks, np.nan)
+    return x, y
+
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
 DEFAULT_CAMPAIGN_SEEDS = (1, 2, 3, 4, 5)
@@ -403,15 +419,24 @@ def plot_va_vs_eta_by_N(
     output_path: Path,
     *,
     scenario: str = "A",
-    N_values: tuple[int, ...] = (40, 100, 400),
+    N_values: tuple[int, ...] = (40, 100, 400, 4000),
     etas: tuple[float, ...] | None = None,
     steps: int = 2000,
     seed: int = 1,
+    seeds: tuple[int, ...] | None = None,
     L: float | None = None,
 ) -> Path:
-    """Generate va vs η plot for different N values (replicates Vicsek 1995 Fig. 1a)."""
+    """Generate va vs η plot for different N values (replicates Vicsek 1995 Fig. 1a).
+
+    When *seeds* is provided, each (N, η) point is averaged over all seeds
+    and plotted with error bars (± 1 std).  The legacy *seed* parameter is
+    used only when *seeds* is ``None`` (single-seed mode, backwards compat).
+    """
     if etas is None:
         etas = tuple(i * 0.25 for i in range(21))  # 0.0 to 5.0 step 0.25
+
+    if seeds is None:
+        seeds = (seed,)
 
     markers = ["o", "s", "^", "D", "v", "P", "*", "X"]
     figure, axis = plt.subplots(figsize=(7, 5))
@@ -423,24 +448,31 @@ def plot_va_vs_eta_by_N(
         else:
             box_L = np.sqrt(N / DEFAULT_RHO)
         means = []
+        stds = []
         for eta in etas:
-            config = make_simulation_config(
-                scenario=scenario,
-                eta=eta,
-                steps=steps,
-                seed=seed,
-                L=box_L,
-                rho=None,
-                N=N,
-            )
-            va_mean = compute_va_mean_inline(config)
+            va_values = []
+            for s in seeds:
+                config = make_simulation_config(
+                    scenario=scenario,
+                    eta=eta,
+                    steps=steps,
+                    seed=s,
+                    L=box_L,
+                    rho=None,
+                    N=N,
+                )
+                va_values.append(compute_va_mean_inline(config))
+            sample = np.asarray(va_values, dtype=float)
+            va_mean = float(sample.mean())
+            va_std = float(sample.std(ddof=1)) if sample.size > 1 else 0.0
             means.append(va_mean)
-            print(f"  N={N}, η={eta:.2f} → va={va_mean:.4f}")
+            stds.append(va_std)
+            print(f"  N={N}, η={eta:.2f} → va={va_mean:.4f} ± {va_std:.4f} ({len(seeds)} seeds)")
 
         marker = markers[idx % len(markers)]
-        axis.plot(
-            etas, means,
-            marker=marker, markersize=4, linewidth=1.0,
+        axis.errorbar(
+            etas, means, yerr=stds,
+            fmt=marker, markersize=4, linewidth=1.0, capsize=3,
             label=f"N={N}",
         )
 
@@ -518,13 +550,23 @@ def animate_trajectory(
         width=0.004, headwidth=3, headlength=4,
     )
     quiver_leader = None
-    if lm.any():
+    has_leader = lm.any()
+    leader_trail_line = None
+    leader_trail_x: list[float] = []
+    leader_trail_y: list[float] = []
+    if has_leader:
         quiver_leader = axis.quiver(
             f0["x"][lm], f0["y"][lm], f0["u"][lm], f0["v"][lm],
             color=LEADER_MAGENTA, edgecolor="white", linewidth=1.0,
             angles="xy", scale_units="xy", scale=arrow_scale * 0.7,
             width=0.010, headwidth=3, headlength=4, zorder=10,
         )
+        (leader_trail_line,) = axis.plot(
+            [], [], linestyle="--", color=LEADER_MAGENTA, alpha=0.6,
+            linewidth=1.2, zorder=5,
+        )
+        leader_trail_x.append(float(f0["x"][lm][0]))
+        leader_trail_y.append(float(f0["y"][lm][0]))
 
     def _update(frame_index: int):
         data = frames[frame_index]
@@ -536,6 +578,12 @@ def animate_trajectory(
         if quiver_leader is not None and lm.any():
             quiver_leader.set_offsets(np.column_stack((data["x"][lm], data["y"][lm])))
             quiver_leader.set_UVC(data["u"][lm], data["v"][lm])
+            leader_trail_x.append(float(data["x"][lm][0]))
+            leader_trail_y.append(float(data["y"][lm][0]))
+            tx, ty = _break_periodic_trail(
+                np.array(leader_trail_x), np.array(leader_trail_y), box_length,
+            )
+            leader_trail_line.set_data(tx, ty)
         title.set_text(f"t = {data['time']:.0f}")
 
     animation = FuncAnimation(figure, _update, frames=len(frames), interval=1000 // fps, blit=False)
@@ -556,10 +604,22 @@ def plot_visualization_figure(
 ) -> Path:
     from collections import deque
 
+    # Collect leader trail positions while iterating to the target frame.
+    leader_trail_x: list[float] = []
+    leader_trail_y: list[float] = []
     if frame_index == -1:
-        frame = deque(iter_extxyz(trajectory_path), maxlen=1).pop()
+        for f in iter_extxyz(trajectory_path):
+            lm = f.types == LEADER_TYPE
+            if lm.any():
+                leader_trail_x.append(float(f.positions[lm, 0][0]))
+                leader_trail_y.append(float(f.positions[lm, 1][0]))
+            frame = f  # keep last
     else:
         for i, f in enumerate(iter_extxyz(trajectory_path)):
+            lm = f.types == LEADER_TYPE
+            if lm.any():
+                leader_trail_x.append(float(f.positions[lm, 0][0]))
+                leader_trail_y.append(float(f.positions[lm, 1][0]))
             if i == frame_index:
                 frame = f
                 break
@@ -641,6 +701,14 @@ def plot_visualization_figure(
             headlength=4,
             zorder=10,
         )
+        if len(leader_trail_x) > 1:
+            tx, ty = _break_periodic_trail(
+                np.array(leader_trail_x), np.array(leader_trail_y), L,
+            )
+            ax_main.plot(
+                tx, ty, linestyle=":", color=LEADER_MAGENTA,
+                alpha=0.5, linewidth=1.5, zorder=5,
+            )
         lx = float(frame.positions[leader_mask, 0][0])
         ly = float(frame.positions[leader_mask, 1][0])
         ax_main.annotate(
