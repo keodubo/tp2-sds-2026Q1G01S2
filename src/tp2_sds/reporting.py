@@ -301,10 +301,10 @@ def _plot_va_timeseries(results_directory: Path, scenario: str, selections: list
         )
         cutoff_time = times[record.summary.t_start]
         axis.axvline(cutoff_time, color=color, linestyle="--", linewidth=1.0, alpha=0.5)
+        axis.axvspan(times[0], cutoff_time, alpha=0.07, color=color)
 
-    axis.set_title(f"Scenario {scenario}: polarization over time")
-    axis.set_xlabel("Time (steps)")
-    axis.set_ylabel("Polarization va")
+    axis.set_xlabel(r"Tiempo (pasos)")
+    axis.set_ylabel(r"Polarización $v_a$")
     axis.set_ylim(-0.05, 1.05)
     axis.legend()
     _save_figure(figure, results_directory / f"va_timeseries_{scenario}")
@@ -319,9 +319,8 @@ def _plot_eta_vs_va(results_directory: Path, scenario: str, points: list[Aggrega
     figure, axis = plt.subplots(figsize=(6.5, 4))
     axis.plot(etas, means, color="C0", linewidth=0.9, alpha=0.7)
     axis.errorbar(etas, means, yerr=stds, fmt="o", color="C0", markersize=4, capsize=3)
-    axis.set_title(f"Scenario {scenario}: mean polarization vs noise")
-    axis.set_xlabel("Noise amplitude eta")
-    axis.set_ylabel("Mean polarization va")
+    axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
+    axis.set_ylabel(r"Polarización media ($v_a$)")
     axis.set_ylim(-0.05, 1.05)
     _save_figure(figure, results_directory / f"eta_vs_va_{scenario}")
 
@@ -349,9 +348,8 @@ def _plot_eta_vs_va_comparison(
             label=f"Scenario {scenario}",
         )
 
-    axis.set_title("Mean polarization vs noise")
-    axis.set_xlabel("Noise amplitude eta")
-    axis.set_ylabel("Mean polarization va")
+    axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
+    axis.set_ylabel(r"Polarización media ($v_a$)")
     axis.set_ylim(-0.05, 1.05)
     axis.legend()
     _save_figure(figure, results_directory / "eta_vs_va_comparison")

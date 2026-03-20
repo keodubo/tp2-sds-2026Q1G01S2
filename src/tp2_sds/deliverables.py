@@ -7,6 +7,8 @@ from pathlib import Path
 
 from .reporting import DEMO_MANIFEST_NAME, RESULTS_DIRECTORY_NAME
 
+GROUP_ID = "2026Q1G01S2"
+DELIVERABLE_PREFIX = f"SdS_TP2_{GROUP_ID}"
 REQUIRED_SCENARIOS = ("A", "B", "C")
 REQUIRED_ROLES = ("low_noise", "high_noise")
 REQUIRED_FIGURE_BASENAMES = (
@@ -194,7 +196,7 @@ def _write_delivery_checklist(path: Path) -> None:
         "",
         "- Verify that the presentation PDF includes fixed screenshots plus an explicit video/demo link.",
         "- Verify that the report is self-contained and uses the same section order as the presentation.",
-        "- Replace the placeholder group identifiers in final filenames: `SdS_TP2_2026Q1GXXCSS_Presentacion.pdf`, `SdS_TP2_2026Q1GXXCSS_Codigo.zip`, `SdS_TP2_2026Q1GXXCSS_Informe.pdf`.",
+        f"- Final filenames must be: `{DELIVERABLE_PREFIX}_Presentacion.pdf`, `{DELIVERABLE_PREFIX}_Codigo.zip`, `{DELIVERABLE_PREFIX}_Informe.pdf`.",
         "- Confirm that scenarios A, B, and C are all discussed and compared in the final material.",
         "- Confirm that `eta_vs_va_comparison` appears in both the presentation and the report.",
         "- If optional densities are included, add one comparative figure for `rho=2` and one for `rho=8`, plus at most two demos per extra density.",
@@ -210,7 +212,7 @@ def _write_presentation_template(path: Path) -> None:
 \usepackage{graphicx}
 \setbeamertemplate{footline}[frame number]
 \title{Simulacion de Sistemas - TP2}
-\author{Grupo XX - Comision SS}
+\author{Grupo 01 - Comisi\'{o}n S2}
 \date{}
 
 \AtBeginSection[]{
@@ -298,7 +300,7 @@ def _write_report_template(path: Path) -> None:
 \usepackage{booktabs}
 
 \title{Simulacion de Sistemas - TP2}
-\author{Grupo XX - Comision SS}
+\author{Grupo 01 - Comisi\'{o}n S2}
 \date{}
 
 \begin{document}

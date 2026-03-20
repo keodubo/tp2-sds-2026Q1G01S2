@@ -1,0 +1,2754 @@
+.
+├── README.md
+├── docs
+│   ├── 2026-03-13_Auditoria_Fases_0_1_v1.md
+│   ├── Guias de Formato
+│   │   ├── GuiaInformes.pdf
+│   │   └── GuiaPresentaciones.pdf
+│   ├── Plan_Implementacion_TP2_OVITO.md
+│   ├── Runbook_Ejecucion_Final_TP2.md
+│   ├── TP2_Enunciado.pdf
+│   └── Teoricas
+│       ├── Teorica_0.pdf
+│       ├── Teorica_1.pdf
+│       └── Teorica_2.pdf
+├── outputs
+│   ├── rho=2.000000
+│   │   ├── aggregate.csv
+│   │   ├── deliverables
+│   │   │   ├── assets
+│   │   │   │   ├── aggregate.csv
+│   │   │   │   ├── demo_manifest.csv
+│   │   │   │   ├── eta_vs_va_A.pdf
+│   │   │   │   ├── eta_vs_va_A.png
+│   │   │   │   ├── eta_vs_va_B.pdf
+│   │   │   │   ├── eta_vs_va_B.png
+│   │   │   │   ├── eta_vs_va_C.pdf
+│   │   │   │   ├── eta_vs_va_C.png
+│   │   │   │   ├── eta_vs_va_comparison.pdf
+│   │   │   │   ├── eta_vs_va_comparison.png
+│   │   │   │   ├── va_timeseries_A.pdf
+│   │   │   │   ├── va_timeseries_A.png
+│   │   │   │   ├── va_timeseries_B.pdf
+│   │   │   │   ├── va_timeseries_B.png
+│   │   │   │   ├── va_timeseries_C.pdf
+│   │   │   │   └── va_timeseries_C.png
+│   │   │   ├── delivery_checklist.md
+│   │   │   ├── ovito_demo_guide.md
+│   │   │   ├── presentation_template.tex
+│   │   │   ├── report_template.tex
+│   │   │   └── scenario_summary.csv
+│   │   ├── results
+│   │   │   ├── demo_manifest.csv
+│   │   │   ├── eta_vs_va_A.pdf
+│   │   │   ├── eta_vs_va_A.png
+│   │   │   ├── eta_vs_va_B.pdf
+│   │   │   ├── eta_vs_va_B.png
+│   │   │   ├── eta_vs_va_C.pdf
+│   │   │   ├── eta_vs_va_C.png
+│   │   │   ├── eta_vs_va_comparison.pdf
+│   │   │   ├── eta_vs_va_comparison.png
+│   │   │   ├── va_timeseries_A.pdf
+│   │   │   ├── va_timeseries_A.png
+│   │   │   ├── va_timeseries_B.pdf
+│   │   │   ├── va_timeseries_B.png
+│   │   │   ├── va_timeseries_C.pdf
+│   │   │   └── va_timeseries_C.png
+│   │   ├── scenario=A
+│   │   │   ├── eta=0.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=0.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   └── eta=5.000000
+│   │   │       ├── seed=1
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=2
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       └── seed=3
+│   │   │           ├── run.json
+│   │   │           ├── summary.json
+│   │   │           └── trajectory.extxyz
+│   │   ├── scenario=B
+│   │   │   ├── eta=0.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=0.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=3
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   └── eta=5.000000
+│   │   │       ├── seed=1
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=2
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       └── seed=3
+│   │   │           ├── run.json
+│   │   │           ├── summary.json
+│   │   │           └── trajectory.extxyz
+│   │   └── scenario=C
+│   │       ├── eta=0.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=0.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=1.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=1.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=4.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=4.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=3
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       └── eta=5.000000
+│   │           ├── seed=1
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           ├── seed=2
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           └── seed=3
+│   │               ├── run.json
+│   │               ├── summary.json
+│   │               └── trajectory.extxyz
+│   ├── rho=4.000000
+│   │   ├── aggregate.csv
+│   │   ├── deliverables
+│   │   │   ├── assets
+│   │   │   │   ├── aggregate.csv
+│   │   │   │   ├── demo_manifest.csv
+│   │   │   │   ├── eta_vs_va_A.pdf
+│   │   │   │   ├── eta_vs_va_A.png
+│   │   │   │   ├── eta_vs_va_B.pdf
+│   │   │   │   ├── eta_vs_va_B.png
+│   │   │   │   ├── eta_vs_va_C.pdf
+│   │   │   │   ├── eta_vs_va_C.png
+│   │   │   │   ├── eta_vs_va_comparison.pdf
+│   │   │   │   ├── eta_vs_va_comparison.png
+│   │   │   │   ├── va_timeseries_A.pdf
+│   │   │   │   ├── va_timeseries_A.png
+│   │   │   │   ├── va_timeseries_B.pdf
+│   │   │   │   ├── va_timeseries_B.png
+│   │   │   │   ├── va_timeseries_C.pdf
+│   │   │   │   └── va_timeseries_C.png
+│   │   │   ├── delivery_checklist.md
+│   │   │   ├── ovito_demo_guide.md
+│   │   │   ├── presentation_template.tex
+│   │   │   ├── report_template.tex
+│   │   │   └── scenario_summary.csv
+│   │   ├── results
+│   │   │   ├── demo_manifest.csv
+│   │   │   ├── eta_vs_va_A.pdf
+│   │   │   ├── eta_vs_va_A.png
+│   │   │   ├── eta_vs_va_B.pdf
+│   │   │   ├── eta_vs_va_B.png
+│   │   │   ├── eta_vs_va_C.pdf
+│   │   │   ├── eta_vs_va_C.png
+│   │   │   ├── eta_vs_va_comparison.pdf
+│   │   │   ├── eta_vs_va_comparison.png
+│   │   │   ├── va_timeseries_A.pdf
+│   │   │   ├── va_timeseries_A.png
+│   │   │   ├── va_timeseries_B.pdf
+│   │   │   ├── va_timeseries_B.png
+│   │   │   ├── va_timeseries_C.pdf
+│   │   │   └── va_timeseries_C.png
+│   │   ├── scenario=A
+│   │   │   ├── eta=0.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=0.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.100000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.200000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.300000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.400000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.600000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.700000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.800000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.900000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.100000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.200000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.300000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.400000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.600000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.700000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.800000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.900000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   └── eta=5.000000
+│   │   │       ├── seed=1
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=2
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=3
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=4
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       └── seed=5
+│   │   │           ├── run.json
+│   │   │           ├── summary.json
+│   │   │           └── trajectory.extxyz
+│   │   ├── scenario=B
+│   │   │   ├── eta=0.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=0.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=1.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.100000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.200000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.300000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.400000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.600000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.700000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.800000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=2.900000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.100000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.200000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.300000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.400000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.600000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.700000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.800000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=3.900000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.000000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   ├── eta=4.500000
+│   │   │   │   ├── seed=1
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=2
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=3
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   ├── seed=4
+│   │   │   │   │   ├── run.json
+│   │   │   │   │   ├── summary.json
+│   │   │   │   │   └── trajectory.extxyz
+│   │   │   │   └── seed=5
+│   │   │   │       ├── run.json
+│   │   │   │       ├── summary.json
+│   │   │   │       └── trajectory.extxyz
+│   │   │   └── eta=5.000000
+│   │   │       ├── seed=1
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=2
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=3
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       ├── seed=4
+│   │   │       │   ├── run.json
+│   │   │       │   ├── summary.json
+│   │   │       │   └── trajectory.extxyz
+│   │   │       └── seed=5
+│   │   │           ├── run.json
+│   │   │           ├── summary.json
+│   │   │           └── trajectory.extxyz
+│   │   └── scenario=C
+│   │       ├── eta=0.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=0.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=1.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=1.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.100000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.200000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.300000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.400000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.600000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.700000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.800000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=2.900000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.100000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.200000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.300000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.400000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.600000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.700000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.800000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=3.900000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=4.000000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       ├── eta=4.500000
+│   │       │   ├── seed=1
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=2
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=3
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   ├── seed=4
+│   │       │   │   ├── run.json
+│   │       │   │   ├── summary.json
+│   │       │   │   └── trajectory.extxyz
+│   │       │   └── seed=5
+│   │       │       ├── run.json
+│   │       │       ├── summary.json
+│   │       │       └── trajectory.extxyz
+│   │       └── eta=5.000000
+│   │           ├── seed=1
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           ├── seed=2
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           ├── seed=3
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           ├── seed=4
+│   │           │   ├── run.json
+│   │           │   ├── summary.json
+│   │           │   └── trajectory.extxyz
+│   │           └── seed=5
+│   │               ├── run.json
+│   │               ├── summary.json
+│   │               └── trajectory.extxyz
+│   └── rho=8.000000
+│       ├── aggregate.csv
+│       ├── deliverables
+│       │   ├── assets
+│       │   │   ├── aggregate.csv
+│       │   │   ├── demo_manifest.csv
+│       │   │   ├── eta_vs_va_A.pdf
+│       │   │   ├── eta_vs_va_A.png
+│       │   │   ├── eta_vs_va_B.pdf
+│       │   │   ├── eta_vs_va_B.png
+│       │   │   ├── eta_vs_va_C.pdf
+│       │   │   ├── eta_vs_va_C.png
+│       │   │   ├── eta_vs_va_comparison.pdf
+│       │   │   ├── eta_vs_va_comparison.png
+│       │   │   ├── va_timeseries_A.pdf
+│       │   │   ├── va_timeseries_A.png
+│       │   │   ├── va_timeseries_B.pdf
+│       │   │   ├── va_timeseries_B.png
+│       │   │   ├── va_timeseries_C.pdf
+│       │   │   └── va_timeseries_C.png
+│       │   ├── delivery_checklist.md
+│       │   ├── ovito_demo_guide.md
+│       │   ├── presentation_template.tex
+│       │   ├── report_template.tex
+│       │   └── scenario_summary.csv
+│       ├── results
+│       │   ├── demo_manifest.csv
+│       │   ├── eta_vs_va_A.pdf
+│       │   ├── eta_vs_va_A.png
+│       │   ├── eta_vs_va_B.pdf
+│       │   ├── eta_vs_va_B.png
+│       │   ├── eta_vs_va_C.pdf
+│       │   ├── eta_vs_va_C.png
+│       │   ├── eta_vs_va_comparison.pdf
+│       │   ├── eta_vs_va_comparison.png
+│       │   ├── va_timeseries_A.pdf
+│       │   ├── va_timeseries_A.png
+│       │   ├── va_timeseries_B.pdf
+│       │   ├── va_timeseries_B.png
+│       │   ├── va_timeseries_C.pdf
+│       │   └── va_timeseries_C.png
+│       ├── scenario=A
+│       │   ├── eta=0.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=0.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=1.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=1.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=2.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=2.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=3.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=3.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=4.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=4.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   └── eta=5.000000
+│       │       ├── seed=1
+│       │       │   ├── run.json
+│       │       │   ├── summary.json
+│       │       │   └── trajectory.extxyz
+│       │       ├── seed=2
+│       │       │   ├── run.json
+│       │       │   ├── summary.json
+│       │       │   └── trajectory.extxyz
+│       │       └── seed=3
+│       │           ├── run.json
+│       │           ├── summary.json
+│       │           └── trajectory.extxyz
+│       ├── scenario=B
+│       │   ├── eta=0.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=0.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=1.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=1.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=2.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=2.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=3.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=3.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=4.000000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   ├── eta=4.500000
+│       │   │   ├── seed=1
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   ├── seed=2
+│       │   │   │   ├── run.json
+│       │   │   │   ├── summary.json
+│       │   │   │   └── trajectory.extxyz
+│       │   │   └── seed=3
+│       │   │       ├── run.json
+│       │   │       ├── summary.json
+│       │   │       └── trajectory.extxyz
+│       │   └── eta=5.000000
+│       │       ├── seed=1
+│       │       │   ├── run.json
+│       │       │   ├── summary.json
+│       │       │   └── trajectory.extxyz
+│       │       ├── seed=2
+│       │       │   ├── run.json
+│       │       │   ├── summary.json
+│       │       │   └── trajectory.extxyz
+│       │       └── seed=3
+│       │           ├── run.json
+│       │           ├── summary.json
+│       │           └── trajectory.extxyz
+│       └── scenario=C
+│           ├── eta=0.000000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=0.500000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=1.000000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=1.500000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=2.000000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=2.500000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=3.000000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=3.500000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=4.000000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           ├── eta=4.500000
+│           │   ├── seed=1
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   ├── seed=2
+│           │   │   ├── run.json
+│           │   │   ├── summary.json
+│           │   │   └── trajectory.extxyz
+│           │   └── seed=3
+│           │       ├── run.json
+│           │       ├── summary.json
+│           │       └── trajectory.extxyz
+│           └── eta=5.000000
+│               ├── seed=1
+│               │   ├── run.json
+│               │   ├── summary.json
+│               │   └── trajectory.extxyz
+│               ├── seed=2
+│               │   ├── run.json
+│               │   ├── summary.json
+│               │   └── trajectory.extxyz
+│               └── seed=3
+│                   ├── run.json
+│                   ├── summary.json
+│                   └── trajectory.extxyz
+├── pyproject.toml
+├── src
+│   ├── tp2_sds
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   ├── analysis.cpython-312.pyc
+│   │   │   ├── cli.cpython-312.pyc
+│   │   │   ├── config.cpython-312.pyc
+│   │   │   ├── deliverables.cpython-312.pyc
+│   │   │   ├── io_extxyz.cpython-312.pyc
+│   │   │   ├── reporting.cpython-312.pyc
+│   │   │   └── simulation.cpython-312.pyc
+│   │   ├── analysis.py
+│   │   ├── cli.py
+│   │   ├── config.py
+│   │   ├── deliverables.py
+│   │   ├── io_extxyz.py
+│   │   ├── reporting.py
+│   │   └── simulation.py
+│   └── tp2_sds.egg-info
+│       ├── PKG-INFO
+│       ├── SOURCES.txt
+│       ├── dependency_links.txt
+│       ├── entry_points.txt
+│       ├── requires.txt
+│       └── top_level.txt
+├── tests
+│   ├── __pycache__
+│   │   ├── conftest.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_analysis.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_cli.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_config.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_deliverables.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_io_extxyz.cpython-312-pytest-8.4.2.pyc
+│   │   ├── test_reporting.cpython-312-pytest-8.4.2.pyc
+│   │   └── test_simulation.cpython-312-pytest-8.4.2.pyc
+│   ├── conftest.py
+│   ├── test_analysis.py
+│   ├── test_cli.py
+│   ├── test_config.py
+│   ├── test_deliverables.py
+│   ├── test_io_extxyz.py
+│   ├── test_reporting.py
+│   └── test_simulation.py
+└── tree.txt
+
+782 directories, 1970 files

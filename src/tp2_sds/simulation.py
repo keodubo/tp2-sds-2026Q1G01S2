@@ -139,10 +139,58 @@ def neighbor_mask(
     interaction_radius: float,
     box_length: float,
 ) -> np.ndarray:
-    deltas = minimum_image_displacements(positions_xy, box_length=box_length)
-    distances_sq = np.sum(deltas * deltas, axis=2)
-    mask = distances_sq <= (interaction_radius * interaction_radius)
-    np.fill_diagonal(mask, True)
+    return _cim_neighbor_mask(positions_xy, interaction_radius=interaction_radius, box_length=box_length)
+
+
+def _cim_neighbor_mask(
+    positions_xy: np.ndarray,
+    *,
+    interaction_radius: float,
+    box_length: float,
+) -> np.ndarray:
+    """Cell Index Method (CIM) for neighbor detection with periodic boundary conditions."""
+    n = positions_xy.shape[0]
+    num_cells = max(1, int(box_length / interaction_radius))
+    cell_size = box_length / num_cells
+    r_sq = interaction_radius * interaction_radius
+
+    # Assign each particle to a cell.
+    cell_indices = np.floor(positions_xy / cell_size).astype(int) % num_cells
+    cell_x = cell_indices[:, 0]
+    cell_y = cell_indices[:, 1]
+
+    # Build cell lists: head[cx, cy] is the first particle in cell (cx, cy),
+    # next_in_cell[i] is the next particle in the same cell as particle i.
+    head = np.full((num_cells, num_cells), -1, dtype=int)
+    next_in_cell = np.full(n, -1, dtype=int)
+    for i in range(n):
+        cx, cy = cell_x[i], cell_y[i]
+        next_in_cell[i] = head[cx, cy]
+        head[cx, cy] = i
+
+    mask = np.zeros((n, n), dtype=bool)
+    offsets = np.array([-1, 0, 1])
+
+    for i in range(n):
+        mask[i, i] = True
+        cx_i, cy_i = cell_x[i], cell_y[i]
+        xi, yi = positions_xy[i]
+        for dcx in offsets:
+            for dcy in offsets:
+                ncx = (cx_i + dcx) % num_cells
+                ncy = (cy_i + dcy) % num_cells
+                j = head[ncx, ncy]
+                while j != -1:
+                    if j > i:
+                        dx = positions_xy[j, 0] - xi
+                        dy = positions_xy[j, 1] - yi
+                        dx -= box_length * round(dx / box_length)
+                        dy -= box_length * round(dy / box_length)
+                        if dx * dx + dy * dy <= r_sq:
+                            mask[i, j] = True
+                            mask[j, i] = True
+                    j = next_in_cell[j]
+
     return mask
 
 
