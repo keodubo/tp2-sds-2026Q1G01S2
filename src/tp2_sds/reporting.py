@@ -191,7 +191,7 @@ def generate_results(
     write_demo_manifest(results_directory / DEMO_MANIFEST_NAME, selections)
 
     for scenario, points in sorted(aggregated_by_scenario.items()):
-        _plot_va_timeseries(results_directory, scenario, selections)
+        _plot_va_timeseries(results_directory, scenario, records)
         _plot_eta_vs_va(results_directory, scenario, points)
     _plot_eta_vs_va_comparison(results_directory, aggregated_by_scenario)
 
@@ -319,43 +319,65 @@ def write_demo_manifest(path: Path, selections: list[DemoSelection]) -> None:
             )
 
 
-def _plot_va_timeseries(results_directory: Path, scenario: str, selections: list[DemoSelection]) -> None:
-    scenario_selections = [selection for selection in selections if selection.scenario == scenario]
-    if not scenario_selections:
+def _plot_va_timeseries(
+    results_directory: Path,
+    scenario: str,
+    records: list[RunRecord],
+    etas_to_plot: tuple[float, ...] = (0.0, 2.5, 5.0),
+) -> None:
+    scenario_records = [r for r in records if r.config.scenario == scenario]
+    if not scenario_records:
         return
 
-    plotted: dict[Path, tuple[RunRecord, list[str]]] = {}
-    for selection in scenario_selections:
-        key = selection.record.run_directory
-        if key not in plotted:
-            plotted[key] = (selection.record, [selection.role])
-        else:
-            plotted[key][1].append(selection.role)
+    # Group records by eta
+    by_eta: dict[float, list[RunRecord]] = defaultdict(list)
+    for record in scenario_records:
+        by_eta[record.config.eta].append(record)
 
     figure, axis = plt.subplots(figsize=(7, 4))
-    color_cycle = iter(plt.rcParams["axes.prop_cycle"].by_key().get("color", ["C0", "C1", "C2"]))
+    colors = ["C0", "C1", "C2", "C3", "C4"]
+    transient_drawn = False
 
-    for run_directory in sorted(plotted):
-        record, roles = plotted[run_directory]
-        color = next(color_cycle, None) or "C0"
-        series = compute_va_series(record.trajectory_path, record.config.v)
-        times = np.asarray([time for time, _ in series], dtype=float)
-        values = np.asarray([value for _, value in series], dtype=float)
-        role_label = "/".join(sorted(roles))
-        axis.plot(
-            times,
-            values,
-            label=f"{role_label} (eta={format_eta(record.config.eta)}, seed={record.config.seed})",
-            color=color,
-            linewidth=1.4,
-        )
-        cutoff_time = times[record.summary.t_start]
-        axis.axvline(cutoff_time, color=color, linestyle="--", linewidth=1.0, alpha=0.5)
-        axis.axvspan(times[0], cutoff_time, alpha=0.07, color=color)
-        mid_transient = (times[0] + cutoff_time) / 2
-        axis.text(mid_transient, 1.0, "transiente", ha="center", va="top", fontsize=8, color=color, alpha=0.7)
-        mid_stationary = (cutoff_time + times[-1]) / 2
-        axis.text(mid_stationary, 1.0, "estado estacionario", ha="center", va="top", fontsize=8, color=color, alpha=0.7)
+    for idx, eta in enumerate(etas_to_plot):
+        # Find closest available eta
+        closest_eta = min(by_eta.keys(), key=lambda e: abs(e - eta))
+        if abs(closest_eta - eta) > 0.01:
+            continue
+        eta_records = by_eta[closest_eta]
+        color = colors[idx % len(colors)]
+
+        # Compute va series for all seeds
+        all_values: list[np.ndarray] = []
+        times: np.ndarray | None = None
+        for record in sorted(eta_records, key=lambda r: r.config.seed):
+            series = compute_va_series(record.trajectory_path, record.config.v)
+            t = np.asarray([time for time, _ in series], dtype=float)
+            v = np.asarray([value for _, value in series], dtype=float)
+            if times is None:
+                times = t
+            all_values.append(v)
+
+        if times is None or not all_values:
+            continue
+
+        matrix = np.stack(all_values)  # (n_seeds, n_timesteps)
+        mean = matrix.mean(axis=0)
+        std = matrix.std(axis=0, ddof=1) if matrix.shape[0] > 1 else np.zeros_like(mean)
+
+        axis.plot(times, mean, color=color, linewidth=1.4, label=f"$\\eta={format_eta(closest_eta)}$")
+        axis.fill_between(times, mean - std, mean + std, color=color, alpha=0.2)
+
+        # Draw transient cutoff once
+        if not transient_drawn:
+            t_start = eta_records[0].summary.t_start
+            cutoff_time = times[t_start]
+            axis.axvline(cutoff_time, color="gray", linestyle="--", linewidth=1.0, alpha=0.5)
+            axis.axvspan(times[0], cutoff_time, alpha=0.07, color="gray")
+            mid_transient = (times[0] + cutoff_time) / 2
+            axis.text(mid_transient, 1.0, "transiente", ha="center", va="top", fontsize=8, color="gray", alpha=0.7)
+            mid_stationary = (cutoff_time + times[-1]) / 2
+            axis.text(mid_stationary, 1.0, "estado estacionario", ha="center", va="top", fontsize=8, color="gray", alpha=0.7)
+            transient_drawn = True
 
     axis.set_xlabel(r"Tiempo (pasos)")
     axis.set_ylabel(r"Polarización $v_a$")
@@ -776,10 +798,13 @@ def plot_visualization_figure(
             )
         lx = float(frame.positions[leader_mask, 0][0])
         ly = float(frame.positions[leader_mask, 1][0])
+        # Place annotation away from edges to avoid overlapping with titles
+        dx = -L * 0.15 if lx > L * 0.5 else L * 0.15
+        dy = -L * 0.15 if ly > L * 0.5 else L * 0.15
         ax_main.annotate(
             "Partícula líder\n(color fijo único)",
             xy=(lx, ly),
-            xytext=(lx + L * 0.15, ly + L * 0.15),
+            xytext=(lx + dx, ly + dy),
             fontsize=8,
             fontweight="bold",
             ha="center",
