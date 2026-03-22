@@ -27,7 +27,7 @@ python3 -m pip install -e ".[dev]"
 | dt        | 1       | Paso temporal                       |
 | η         | 0.0–5.0 | Ruido (barrido en pasos de 0.5)     |
 | seeds     | 1–5     | Realizaciones para promedio y error  |
-| steps     | 5000    | Pasos de simulación                 |
+| steps     | 2000    | Pasos de simulación                 |
 
 ## Generar los entregables
 
@@ -43,7 +43,7 @@ chmod +x generate_all.sh
 1. **Campaña ρ=4** (obligatoria): simula A/B/C × 11 etas × 5 seeds = 165 corridas, analiza y genera figuras.
 2. **Campaña ρ=2** (opcional): ídem con N=200.
 3. **Campaña ρ=8** (opcional): ídem con N=800.
-4. **Packaging**: valida resultados, copia assets, genera templates .tex, arma ZIP de código.
+4. **Packaging**: valida resultados, copia assets, genera el template del informe y arma el ZIP de código.
 5. **Aliases legacy**: copia visualizaciones y animaciones low-noise a `results/`.
 
 **Variables de entorno para override**:
@@ -61,7 +61,7 @@ FORCE_REBUILD=1 ./generate_all.sh
 
 | Variable           | Default                           | Descripción                        |
 |--------------------|-----------------------------------|------------------------------------|
-| `STEPS`            | 5000                              | Pasos de simulación                |
+| `STEPS`            | 2000                              | Pasos de simulación                |
 | `SEEDS`            | 1,2,3,4,5                         | Seeds para promedios               |
 | `ETAS`             | 0.0,0.5,...,5.0                   | Valores de η                       |
 | `RUNS_BASE`        | outputs                           | Directorio base de corridas        |
@@ -105,10 +105,11 @@ deliverables/                          ← bundle de entrega
   scenario_summary.csv
   ovito_demo_guide.md
   delivery_checklist.md
-  SdS_TP2_2026Q1G01S2_Presentacion.tex
   SdS_TP2_2026Q1G01S2_Informe.tex
   SdS_TP2_2026Q1G01S2_Codigo.zip
 ```
+
+La presentación se prepara manualmente y no forma parte de los archivos `.tex` generados por el pipeline.
 
 ## Comandos CLI
 
@@ -119,7 +120,7 @@ Todos los comandos se ejecutan con `tp2-sds`.
 Ejecuta batch de simulaciones + análisis + generación de figuras:
 
 ```bash
-tp2-sds campaign --runs-root outputs/rho=4 --L 10 --rho 4 --steps 5000 \
+tp2-sds campaign --runs-root outputs/rho=4 --L 10 --rho 4 --steps 2000 \
   --seeds 1,2,3,4,5 --etas 0.0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0 \
   --skip-existing
 ```
@@ -138,7 +139,7 @@ tp2-sds package --runs-root outputs/rho=4 --out-dir deliverables \
 Genera una corrida individual:
 
 ```bash
-tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 5000 --L 10 --rho 4
+tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 2000 --L 10 --rho 4
 ```
 
 ### batch
@@ -146,7 +147,7 @@ tp2-sds simulate --scenario A --eta 0.1 --seed 42 --steps 5000 --L 10 --rho 4
 Producto cartesiano de corridas:
 
 ```bash
-tp2-sds batch --scenarios A,B,C --etas 0.1,0.5,2.0 --seeds 1,2,3 --steps 5000 --skip-existing
+tp2-sds batch --scenarios A,B,C --etas 0.1,0.5,2.0 --seeds 1,2,3 --steps 2000 --skip-existing
 ```
 
 ### analyze
@@ -178,7 +179,7 @@ tp2-sds visualize --scenario B --eta 0.1 --N 400 --L 10 --steps 2000 --seed 42 -
 Barrido va vs η para distintos N:
 
 ```bash
-tp2-sds sweep --scenario A --N-values 40,100,400 --steps 5000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
+tp2-sds sweep --scenario A --N-values 40,100,400 --steps 2000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
 ```
 
 ### timeseries

@@ -62,12 +62,13 @@ def test_package_command_creates_deliverables_bundle(tmp_path: Path) -> None:
         deliverables_root / "scenario_summary.csv",
         deliverables_root / "ovito_demo_guide.md",
         deliverables_root / "delivery_checklist.md",
-        deliverables_root / f"{DELIVERABLE_PREFIX}_Presentacion.tex",
         deliverables_root / f"{DELIVERABLE_PREFIX}_Informe.tex",
         deliverables_root / f"{DELIVERABLE_PREFIX}_Codigo.zip",
     ]
     for path in expected_output_paths:
         assert path.exists(), f"Missing: {path}"
+
+    assert not (deliverables_root / f"{DELIVERABLE_PREFIX}_Presentacion.tex").exists()
 
     with (deliverables_root / "scenario_summary.csv").open("r", encoding="utf-8", newline="") as handle:
         rows = list(csv.DictReader(handle))
@@ -79,11 +80,7 @@ def test_package_command_creates_deliverables_bundle(tmp_path: Path) -> None:
 
     checklist_text = (deliverables_root / "delivery_checklist.md").read_text(encoding="utf-8")
     assert "rho=2" in checklist_text
-
-    presentation_text = (deliverables_root / f"{DELIVERABLE_PREFIX}_Presentacion.tex").read_text(encoding="utf-8")
-    assert "\\setbeamertemplate{footline}[frame number]" in presentation_text
-    # Without extras, should have placeholder text for optional densities
-    assert "Opcional" not in presentation_text or "rho" not in presentation_text or True
+    assert "does not generate a presentation `.tex` file" in checklist_text
 
     report_text = (deliverables_root / f"{DELIVERABLE_PREFIX}_Informe.tex").read_text(encoding="utf-8")
     assert "densidades extra" in report_text
@@ -116,9 +113,7 @@ def test_package_with_extra_densities(tmp_path: Path) -> None:
     assert (assets_dir / "eta_vs_va_comparison_rho2.png").exists()
     assert (assets_dir / "eta_vs_va_comparison_rho2.pdf").exists()
     assert (assets_dir / "demo_manifest_rho2.csv").exists()
-
-    presentation_text = (deliverables_root / f"{DELIVERABLE_PREFIX}_Presentacion.tex").read_text(encoding="utf-8")
-    assert "eta_vs_va_comparison_rho2" in presentation_text
+    assert not (deliverables_root / f"{DELIVERABLE_PREFIX}_Presentacion.tex").exists()
 
     report_text = (deliverables_root / f"{DELIVERABLE_PREFIX}_Informe.tex").read_text(encoding="utf-8")
     assert "eta_vs_va_comparison_rho2" in report_text

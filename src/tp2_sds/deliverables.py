@@ -65,11 +65,6 @@ def package_deliverables(
     _write_scenario_summary(out_dir / "scenario_summary.csv", aggregate_rows, manifest_rows)
     _write_ovito_demo_guide(out_dir / "ovito_demo_guide.md", manifest_rows)
     _write_delivery_checklist(out_dir / "delivery_checklist.md")
-    _write_presentation_template(
-        out_dir / f"{DELIVERABLE_PREFIX}_Presentacion.tex",
-        has_rho2=has_rho2,
-        has_rho8=has_rho8,
-    )
     _write_report_template(
         out_dir / f"{DELIVERABLE_PREFIX}_Informe.tex",
         has_rho2=has_rho2,
@@ -247,6 +242,7 @@ def _write_delivery_checklist(path: Path) -> None:
         "# Delivery checklist",
         "",
         "- Verify that the presentation PDF includes fixed screenshots plus an explicit video/demo link.",
+        "- The presentation source is maintained manually; the packaging step does not generate a presentation `.tex` file.",
         "- Verify that the report is self-contained and uses the same section order as the presentation.",
         f"- Final filenames must be: `{DELIVERABLE_PREFIX}_Presentacion.pdf`, `{DELIVERABLE_PREFIX}_Codigo.zip`, `{DELIVERABLE_PREFIX}_Informe.pdf`.",
         "- Confirm that scenarios A, B, and C are all discussed and compared in the final material.",
@@ -256,106 +252,6 @@ def _write_delivery_checklist(path: Path) -> None:
         "- Keep only the final source code in the code zip; do not include outputs or generated media.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def _write_presentation_template(path: Path, *, has_rho2: bool = False, has_rho8: bool = False) -> None:
-    optional_frames = ""
-    if has_rho2 or has_rho8:
-        parts = []
-        if has_rho2:
-            parts.append(r"""
-\begin{frame}{Densidad extra: $\rho = 2$}
-\includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison_rho2.pdf}
-
-\vspace{0.5em}
-\small Elegir como maximo 2 demos (bajo y alto ruido). Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
-\end{frame}""")
-        if has_rho8:
-            parts.append(r"""
-\begin{frame}{Densidad extra: $\rho = 8$}
-\includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison_rho8.pdf}
-
-\vspace{0.5em}
-\small Elegir como maximo 2 demos (bajo y alto ruido). Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
-\end{frame}""")
-        optional_frames = "\n".join(parts)
-
-    template = r"""\documentclass{beamer}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\setbeamertemplate{footline}[frame number]
-\title{Simulacion de Sistemas - TP2}
-\author{Grupo 01 - Comisi\'{o}n S2}
-\date{}
-
-\AtBeginSection[]{
-\begin{frame}
-\centering
-\Large\insertsection
-\end{frame}
-}
-
-\begin{document}
-
-\frame{\titlepage}
-
-\section{Introduccion}
-\begin{frame}{Sistema y modelo}
-Resumen tecnico del modelo de Vicsek, parametros principales y objetivo del estudio.
-\end{frame}
-
-\section{Implementacion}
-\begin{frame}{Arquitectura}
-Describir el motor de simulacion, el formato de salida y el pipeline de analisis.
-\end{frame}
-
-\section{Simulaciones}
-\begin{frame}{Configuracion}
-Detallar rango de ruido, cantidad de seeds, steps y criterio de estado estacionario.
-\end{frame}
-
-\section{Resultados}
-\begin{frame}{Escenario A}
-\includegraphics[width=0.48\textwidth]{assets/va_timeseries_A.pdf}
-\includegraphics[width=0.48\textwidth]{assets/eta_vs_va_A.pdf}
-
-\vspace{0.5em}
-\small Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
-\end{frame}
-
-\begin{frame}{Escenario B}
-\includegraphics[width=0.48\textwidth]{assets/va_timeseries_B.pdf}
-\includegraphics[width=0.48\textwidth]{assets/eta_vs_va_B.pdf}
-
-\vspace{0.5em}
-\small Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
-\end{frame}
-
-\begin{frame}{Escenario C}
-\includegraphics[width=0.48\textwidth]{assets/va_timeseries_C.pdf}
-\includegraphics[width=0.48\textwidth]{assets/eta_vs_va_C.pdf}
-
-\vspace{0.5em}
-\small Demo link: \texttt{REEMPLAZAR\_POR\_LINK}
-\end{frame}
-
-\begin{frame}{Comparacion final}
-\includegraphics[width=0.8\textwidth]{assets/eta_vs_va_comparison.pdf}
-\end{frame}
-""" + optional_frames + r"""
-
-\section{Conclusiones}
-\begin{frame}{Conclusiones}
-\begin{itemize}
-\item Concluir solo a partir de los resultados mostrados.
-\item Resumir diferencias entre A, B y C.
-\item Indicar el criterio usado para el estado estacionario.
-\end{itemize}
-\end{frame}
-
-\end{document}
-"""
-    path.write_text(template + "\n", encoding="utf-8")
 
 
 def _write_report_template(path: Path, *, has_rho2: bool = False, has_rho8: bool = False) -> None:
