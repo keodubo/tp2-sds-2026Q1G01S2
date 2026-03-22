@@ -3,7 +3,6 @@ from __future__ import annotations
 import csv
 import re
 import shutil
-import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,9 +21,6 @@ REQUIRED_FIGURE_BASENAMES = (
     "eta_vs_va_C",
     "eta_vs_va_comparison",
 )
-
-CODE_ZIP_INCLUDES = ("src", "tests", "pyproject.toml", "README.md", "generate_all.sh")
-CODE_ZIP_EXCLUDES = ("__pycache__", ".egg-info")
 
 
 @dataclass(frozen=True)
@@ -56,21 +52,14 @@ def package_deliverables(
     extra_densities = _package_extra_densities(assets_dir, extra_runs_roots or [])
     packaged_assets += extra_densities
 
-    aggregate_rows = _read_csv_rows(aggregate_path)
-    manifest_rows = _read_csv_rows(manifest_path)
-
     has_rho2 = (assets_dir / "eta_vs_va_comparison_rho2.png").exists()
     has_rho8 = (assets_dir / "eta_vs_va_comparison_rho8.png").exists()
 
-    _write_scenario_summary(out_dir / "scenario_summary.csv", aggregate_rows, manifest_rows)
-    _write_ovito_demo_guide(out_dir / "ovito_demo_guide.md", manifest_rows)
-    _write_delivery_checklist(out_dir / "delivery_checklist.md")
     _write_report_template(
         out_dir / f"{DELIVERABLE_PREFIX}_Informe.tex",
         has_rho2=has_rho2,
         has_rho8=has_rho8,
     )
-    _create_code_zip(out_dir)
 
     return PackageResult(out_dir=out_dir, assets_dir=assets_dir, packaged_assets=packaged_assets)
 
@@ -163,95 +152,6 @@ def _read_csv_rows(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
 
-
-def _write_scenario_summary(
-    path: Path,
-    aggregate_rows: list[dict[str, str]],
-    manifest_rows: list[dict[str, str]],
-) -> None:
-    rows_by_scenario: dict[str, list[dict[str, str]]] = {scenario: [] for scenario in REQUIRED_SCENARIOS}
-    for row in aggregate_rows:
-        if row["scenario"] in rows_by_scenario:
-            rows_by_scenario[row["scenario"]].append(row)
-
-    demo_by_key = {(row["scenario"], row["role"]): row for row in manifest_rows}
-    with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(
-            handle,
-            fieldnames=[
-                "scenario",
-                "eta_min",
-                "eta_max",
-                "num_eta",
-                "min_num_seeds",
-                "max_num_seeds",
-                "low_noise_eta",
-                "low_noise_seed",
-                "high_noise_eta",
-                "high_noise_seed",
-            ],
-        )
-        writer.writeheader()
-        for scenario in REQUIRED_SCENARIOS:
-            rows = rows_by_scenario[scenario]
-            etas = [float(row["eta"]) for row in rows]
-            num_seeds = [int(row["num_seeds"]) for row in rows]
-            low_demo = demo_by_key[(scenario, "low_noise")]
-            high_demo = demo_by_key[(scenario, "high_noise")]
-            writer.writerow(
-                {
-                    "scenario": scenario,
-                    "eta_min": f"{min(etas):.6f}",
-                    "eta_max": f"{max(etas):.6f}",
-                    "num_eta": len(rows),
-                    "min_num_seeds": min(num_seeds),
-                    "max_num_seeds": max(num_seeds),
-                    "low_noise_eta": low_demo["eta"],
-                    "low_noise_seed": low_demo["seed"],
-                    "high_noise_eta": high_demo["eta"],
-                    "high_noise_seed": high_demo["seed"],
-                }
-            )
-
-
-def _write_ovito_demo_guide(path: Path, manifest_rows: list[dict[str, str]]) -> None:
-    lines = [
-        "# OVITO demo guide",
-        "",
-        "Use the trajectories listed below for the live demos.",
-        "",
-        "Recommended OVITO settings:",
-        "- Open the trajectory file from the path in the table.",
-        "- Keep particle colors from the `Color` property.",
-        "- Enable vectors using the `Velocity` property.",
-        "- Keep the leader visually distinct by using the stored particle type and radius.",
-        "- Use the low-noise and high-noise runs to illustrate ordering and disorder.",
-        "",
-        "| Scenario | Role | Eta | Seed | Trajectory |",
-        "| --- | --- | --- | --- | --- |",
-    ]
-    for row in sorted(manifest_rows, key=lambda item: (item["scenario"], item["role"])):
-        lines.append(
-            f"| {row['scenario']} | {row['role']} | {row['eta']} | {row['seed']} | `{row['trajectory_path']}` |"
-        )
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-
-
-def _write_delivery_checklist(path: Path) -> None:
-    lines = [
-        "# Delivery checklist",
-        "",
-        "- Verify that the presentation PDF includes fixed screenshots plus an explicit video/demo link.",
-        "- The presentation source is maintained manually; the packaging step does not generate a presentation `.tex` file.",
-        "- Verify that the report is self-contained and uses the same section order as the presentation.",
-        f"- Final filenames must be: `{DELIVERABLE_PREFIX}_Presentacion.pdf`, `{DELIVERABLE_PREFIX}_Codigo.zip`, `{DELIVERABLE_PREFIX}_Informe.pdf`.",
-        "- Confirm that scenarios A, B, and C are all discussed and compared in the final material.",
-        "- Confirm that `eta_vs_va_comparison` appears in both the presentation and the report.",
-        "- If optional densities are included, add one comparative figure for `rho=2` and one for `rho=8`, plus at most two demos per extra density.",
-        "- Use `ovito_demo_guide.md` and `assets/demo_manifest.csv` to prepare the live demo order.",
-        "- Keep only the final source code in the code zip; do not include outputs or generated media.",
-    ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def _write_report_template(path: Path, *, has_rho2: bool = False, has_rho8: bool = False) -> None:
@@ -349,19 +249,3 @@ Agregar aqui la referencia al articulo de Vicsek y cualquier otra fuente citada 
     path.write_text(template + "\n", encoding="utf-8")
 
 
-def _create_code_zip(out_dir: Path) -> Path:
-    """Create the source code ZIP with only the allowed files."""
-    project_root = Path(__file__).resolve().parent.parent.parent
-    zip_path = out_dir / f"{DELIVERABLE_PREFIX}_Codigo.zip"
-
-    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
-        for include in CODE_ZIP_INCLUDES:
-            source = project_root / include
-            if source.is_file():
-                zf.write(source, include)
-            elif source.is_dir():
-                for file_path in sorted(source.rglob("*")):
-                    if file_path.is_file() and not any(exc in str(file_path) for exc in CODE_ZIP_EXCLUDES):
-                        zf.write(file_path, str(file_path.relative_to(project_root)))
-
-    return zip_path

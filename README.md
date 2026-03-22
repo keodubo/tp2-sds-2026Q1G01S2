@@ -44,7 +44,6 @@ chmod +x generate_all.sh
 2. **Campaña ρ=2** (opcional): ídem con N=200.
 3. **Campaña ρ=8** (opcional): ídem con N=800.
 4. **Packaging**: valida resultados, copia assets, genera el template del informe y arma el ZIP de código.
-5. **Aliases legacy**: copia visualizaciones y animaciones low-noise a `results/`.
 
 **Variables de entorno para override**:
 
@@ -95,18 +94,15 @@ outputs/
 
 deliverables/                          ← bundle de entrega
   assets/
-    aggregate.csv
-    demo_manifest.csv
-    va_timeseries_{A,B,C}.{png,pdf}
-    eta_vs_va_{A,B,C}.{png,pdf}
-    eta_vs_va_comparison.{png,pdf}
-    eta_vs_va_comparison_rho2.{png,pdf}  (si --extra-runs-roots)
-    eta_vs_va_comparison_rho8.{png,pdf}  (si --extra-runs-roots)
-  scenario_summary.csv
-  ovito_demo_guide.md
-  delivery_checklist.md
+    snapshot_{A,B,C}.png                 ← capturas representativas
+    va_timeseries_{A,B,C}.pdf           ← evolución temporal promediada
+    eta_vs_va_{A,B,C}.pdf               ← va vs η por escenario
+    eta_vs_va_comparison.pdf            ← comparación de los 3 escenarios
+    eta_vs_va_comparison_rho2.pdf       (si --extra-runs-roots)
+    eta_vs_va_comparison_rho8.pdf       (si --extra-runs-roots)
+    rho{2,8}_{low,high}_noise.png       ← capturas para densidades extra
   SdS_TP2_2026Q1G01S2_Informe.tex
-  SdS_TP2_2026Q1G01S2_Codigo.zip
+  SdS_TP2_2026Q1G01S2_Informe.pdf
 ```
 
 La presentación se prepara manualmente y no forma parte de los archivos `.tex` generados por el pipeline.
@@ -163,7 +159,7 @@ tp2-sds analyze --runs-root outputs/rho=4
 Genera animación GIF desde una trayectoria:
 
 ```bash
-tp2-sds animate outputs/rho=4/scenario=A/eta=0.100000/seed=1/trajectory.extxyz --output results/anim_A
+tp2-sds animate outputs/rho=4/scenario=A/eta=0.100000/seed=1/trajectory.extxyz --output outputs/anim_A
 ```
 
 ### visualize
@@ -171,7 +167,7 @@ tp2-sds animate outputs/rho=4/scenario=A/eta=0.100000/seed=1/trajectory.extxyz -
 Genera figura estática HSV:
 
 ```bash
-tp2-sds visualize --scenario B --eta 0.1 --N 400 --L 10 --steps 2000 --seed 42 --output results/viz_B
+tp2-sds visualize --scenario B --eta 0.1 --N 400 --L 10 --steps 2000 --seed 42 --output outputs/viz_B
 ```
 
 ### sweep
@@ -179,7 +175,7 @@ tp2-sds visualize --scenario B --eta 0.1 --N 400 --L 10 --steps 2000 --seed 42 -
 Barrido va vs η para distintos N:
 
 ```bash
-tp2-sds sweep --scenario A --N-values 40,100,400 --steps 2000 --seeds 1,2,3,4,5 --output results/va_vs_eta_by_N_A
+tp2-sds sweep --scenario A --N-values 40,100,400 --steps 2000 --seeds 1,2,3,4,5 --output outputs/va_vs_eta_by_N_A
 ```
 
 ### timeseries
@@ -187,7 +183,7 @@ tp2-sds sweep --scenario A --N-values 40,100,400 --steps 2000 --seeds 1,2,3,4,5 
 Evolución temporal de va para múltiples η:
 
 ```bash
-tp2-sds timeseries --scenario A --N 400 --etas 0.0,0.2,0.6,1.2,2.4,3.0,5.2 --steps 1000 --output results/va_timeseries
+tp2-sds timeseries --scenario A --N 400 --etas 0.0,0.2,0.6,1.2,2.4,3.0,5.2 --steps 1000 --output outputs/va_timeseries
 ```
 
 ## Tests

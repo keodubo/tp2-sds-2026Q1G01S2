@@ -44,8 +44,6 @@ if [ "$FORCE_REBUILD" != "1" ]; then
     SKIP_FLAG="--skip-existing"
 fi
 
-RESULTS=results
-mkdir -p "$RESULTS"
 
 # =============================================================================
 echo "=============================================="
@@ -108,28 +106,6 @@ run_cli package \
 # =============================================================================
 echo ""
 echo "=============================================="
-echo " PASO 5: Aliases legacy en results/"
-echo "=============================================="
-
-# Copiar visualizaciones y animaciones low-noise de ρ=4 a results/ para compatibilidad
-RHO4_RESULTS="${RHO4_ROOT}/results"
-for SCENARIO in A B C; do
-    # Buscar visualización low-noise
-    VIZ=$(ls "${RHO4_RESULTS}"/visualization_${SCENARIO}_eta*.png 2>/dev/null | head -1 || true)
-    if [ -n "$VIZ" ]; then
-        cp "$VIZ" "${RESULTS}/viz_${SCENARIO}.png"
-        cp "${VIZ%.png}.pdf" "${RESULTS}/viz_${SCENARIO}.pdf" 2>/dev/null || true
-    fi
-    # Buscar animación low-noise
-    ANIM=$(ls "${RHO4_RESULTS}"/animation_${SCENARIO}_low_noise*.gif 2>/dev/null | head -1 || true)
-    if [ -n "$ANIM" ]; then
-        cp "$ANIM" "${RESULTS}/anim_${SCENARIO}.gif"
-    fi
-done
-
-# =============================================================================
-echo ""
-echo "=============================================="
 echo " LISTO"
 echo "=============================================="
 echo ""
@@ -138,7 +114,4 @@ ls "$DELIVERABLES_DIR"/ 2>/dev/null | sed 's/^/    /'
 echo ""
 echo "  Assets:"
 ls "$DELIVERABLES_DIR"/assets/ 2>/dev/null | sed 's/^/    /'
-echo ""
-echo "  Aliases legacy en: ${RESULTS}/"
-ls "$RESULTS"/ 2>/dev/null | sed 's/^/    /'
 echo ""
