@@ -9,6 +9,7 @@ import numpy as np
 
 from .config import RunSummary, SimulationConfig, format_eta
 from .io_extxyz import iter_extxyz
+from .simulation import LEADER_TYPE
 
 DEFAULT_TRANSIENT_FRACTION = 0.3
 
@@ -66,6 +67,33 @@ def compute_va_series(trajectory_path: Path, speed: float) -> list[tuple[float, 
         collective_velocity = np.linalg.norm(frame.velocities[:, :2].sum(axis=0))
         particle_count = frame.velocities.shape[0]
         values.append((frame.time, float(collective_velocity / (particle_count * speed))))
+    return values
+
+
+def compute_angular_correlation_series(
+    trajectory_path: Path,
+) -> list[tuple[float, float, float, float]]:
+    """Compute collective angle and leader-swarm angular correlation.
+
+    Returns list of (time, theta_S, theta_L, C) tuples.
+    Only meaningful for trajectories with a leader particle (scenarios B/C).
+    Returns empty list if no leader is found.
+    """
+    values: list[tuple[float, float, float, float]] = []
+    for frame in iter_extxyz(trajectory_path):
+        leader_mask = frame.types == LEADER_TYPE
+        if not np.any(leader_mask):
+            return []
+        swarm_mask = ~leader_mask
+        swarm_vx = frame.velocities[swarm_mask, 0]
+        swarm_vy = frame.velocities[swarm_mask, 1]
+        swarm_angles = np.arctan2(swarm_vy, swarm_vx)
+        theta_s = float(np.arctan2(np.mean(np.sin(swarm_angles)), np.mean(np.cos(swarm_angles))))
+        leader_vx = frame.velocities[leader_mask, 0][0]
+        leader_vy = frame.velocities[leader_mask, 1][0]
+        theta_l = float(np.arctan2(leader_vy, leader_vx))
+        c = float(np.cos(theta_l - theta_s))
+        values.append((frame.time, theta_s, theta_l, c))
     return values
 
 

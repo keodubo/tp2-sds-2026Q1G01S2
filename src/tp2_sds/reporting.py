@@ -10,7 +10,7 @@ from pathlib import Path
 import matplotlib
 import numpy as np
 
-from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs, compute_va_series, discover_run_directories, stationary_window
+from .analysis import DEFAULT_TRANSIENT_FRACTION, analyze_runs, compute_angular_correlation_series, compute_va_series, discover_run_directories, stationary_window
 from .config import (
     DEFAULT_DT,
     DEFAULT_L,
@@ -194,6 +194,18 @@ def generate_results(
         _plot_va_timeseries(results_directory, scenario, selections)
         _plot_eta_vs_va(results_directory, scenario, points)
     _plot_eta_vs_va_comparison(results_directory, aggregated_by_scenario)
+
+    for selection in selections:
+        if selection.scenario in ("B", "C"):
+            eta_tag = format_eta(selection.record.config.eta)
+            seed = selection.record.config.seed
+            corr_name = f"angular_correlation_{selection.scenario}_{selection.role}_eta{eta_tag}_seed{seed}"
+            plot_angular_correlation(
+                selection.record.trajectory_path,
+                results_directory / corr_name,
+                scenario=selection.scenario,
+                eta=selection.record.config.eta,
+            )
 
     for selection in selections:
         eta_tag = format_eta(selection.record.config.eta)
@@ -806,6 +818,53 @@ def plot_visualization_figure(
     figure.savefig(output_path.with_suffix(".png"), dpi=dpi, bbox_inches="tight")
     figure.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
     plt.close(figure)
+    return output_path.with_suffix(".png")
+
+
+def plot_angular_correlation(
+    trajectory_path: Path,
+    output_path: Path,
+    *,
+    scenario: str = "",
+    eta: float = 0.0,
+) -> Path | None:
+    """Plot collective angle theta_S, leader angle theta_L, and correlation C(t).
+
+    Returns the output PNG path, or None if the trajectory has no leader.
+    """
+    series = compute_angular_correlation_series(trajectory_path)
+    if not series:
+        return None
+
+    times = np.asarray([t for t, _, _, _ in series], dtype=float)
+    theta_s = np.asarray([ts for _, ts, _, _ in series], dtype=float)
+    theta_l = np.asarray([tl for _, _, tl, _ in series], dtype=float)
+    correlation = np.asarray([c for _, _, _, c in series], dtype=float)
+
+    figure, (ax_angles, ax_corr) = plt.subplots(2, 1, figsize=(8, 6), sharex=True)
+
+    ax_angles.plot(times, theta_l, linewidth=1.0, label=r"$\theta_L$ (líder)", color=LEADER_MAGENTA)
+    ax_angles.plot(times, theta_s, linewidth=1.0, label=r"$\theta_S$ (colectivo)", color="C0")
+    ax_angles.set_ylabel(r"Ángulo (rad)")
+    ax_angles.set_ylim(-np.pi - 0.3, np.pi + 0.3)
+    ax_angles.axhline(np.pi, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+    ax_angles.axhline(-np.pi, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+    ax_angles.legend(loc="upper right")
+    title = f"Escenario {scenario}" if scenario else "Correlación angular"
+    if eta > 0:
+        title += rf" ($\eta$ = {eta:.1f})"
+    ax_angles.set_title(title)
+
+    ax_corr.plot(times, correlation, linewidth=1.0, color="C2")
+    ax_corr.set_xlabel(r"Tiempo (pasos)")
+    ax_corr.set_ylabel(r"$C(t) = \cos(\theta_L - \theta_S)$")
+    ax_corr.set_ylim(-1.1, 1.1)
+    ax_corr.axhline(1.0, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+    ax_corr.axhline(0.0, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+    ax_corr.axhline(-1.0, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    _save_figure(figure, output_path)
     return output_path.with_suffix(".png")
 
 
