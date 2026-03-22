@@ -400,7 +400,7 @@ def _plot_eta_vs_va_comparison(
             fmt=markers.get(scenario, "o"),
             markersize=4,
             capsize=3,
-            label=f"Scenario {scenario}",
+            label=f"Escenario {scenario}",
         )
 
     axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
@@ -707,7 +707,7 @@ def plot_visualization_figure(
     ax_wheel = figure.add_subplot(gs[0, 1], projection="polar")
 
     figure.suptitle(
-        "VISUALIZATION OF SELF-PROPELLED PARTICLE FLOCKING (VICSEK MODEL)",
+        "VISUALIZACIÓN DE BANDADA DE PARTÍCULAS AUTOPROPULSADAS (MODELO DE VICSEK)",
         fontsize=13,
         fontweight="bold",
         y=0.97,
@@ -715,7 +715,7 @@ def plot_visualization_figure(
 
     eta_str = f"{eta:.1f}" if eta is not None else "?"
     ax_main.set_title(
-        f"Simulation Parameters: (N={N_particles}, L={L:.0f}, \u03b7={eta_str})",
+        f"Parámetros de simulación: (N={N_particles}, L={L:.0f}, \u03b7={eta_str})",
         fontsize=10,
         pad=8,
     )
@@ -777,7 +777,7 @@ def plot_visualization_figure(
         lx = float(frame.positions[leader_mask, 0][0])
         ly = float(frame.positions[leader_mask, 1][0])
         ax_main.annotate(
-            "Leader Agent\n(Fixed Unique Color)",
+            "Partícula líder\n(color fijo único)",
             xy=(lx, ly),
             xytext=(lx + L * 0.15, ly + L * 0.15),
             fontsize=8,
@@ -809,7 +809,7 @@ def plot_visualization_figure(
         )
 
     ax_wheel.set_title(
-        "Cyclicalization for\nDirection to Color\n(0 a 2\u03c0 radians)",
+        "Mapeo cíclico\ndirección \u2192 color\n(0 a 2\u03c0 radianes)",
         fontsize=9,
         pad=12,
     )
