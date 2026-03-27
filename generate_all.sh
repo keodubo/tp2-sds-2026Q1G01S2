@@ -3,7 +3,7 @@
 # generate_all.sh — Pipeline completo de entrega del TP2
 #
 # Genera campañas para ρ=4 (obligatorio) y ρ=2, ρ=8 (opcionales),
-# luego arma el bundle de entregables en deliverables/.
+# luego actualiza el bundle de entregables en deliverables/.
 #
 # Parámetros alineados al enunciado: L=10, ρ=4, v=0.03, r=1, dt=1.
 #
@@ -15,6 +15,9 @@
 #   DELIVERABLES_DIR=deliverables  Directorio de salida del bundle
 #   FORCE_REBUILD=1      Forzar recálculo (no skip-existing)
 #   SKIP_OPTIONAL=1      Saltar densidades opcionales ρ=2 y ρ=8
+#
+# Si ya existe un informe manual en DELIVERABLES_DIR, el packaging preserva ese
+# .tex y sólo actualiza los assets/copias auxiliares.
 #
 # Uso:
 #   chmod +x generate_all.sh

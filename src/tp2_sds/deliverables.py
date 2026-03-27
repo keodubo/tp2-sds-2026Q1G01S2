@@ -49,23 +49,52 @@ def package_deliverables(
         shutil.copy2(path, assets_dir / path.name)
         packaged_assets += 1
 
+    packaged_assets += _package_report_assets(assets_dir, results_dir)
     extra_densities = _package_extra_densities(assets_dir, extra_runs_roots or [])
     packaged_assets += extra_densities
 
     has_rho2 = (assets_dir / "eta_vs_va_comparison_rho2.png").exists()
     has_rho8 = (assets_dir / "eta_vs_va_comparison_rho8.png").exists()
 
-    _write_report_template(
-        out_dir / f"{DELIVERABLE_PREFIX}_Informe.tex",
-        has_rho2=has_rho2,
-        has_rho8=has_rho8,
-    )
+    report_path = out_dir / f"{DELIVERABLE_PREFIX}_Informe.tex"
+    if not report_path.exists():
+        _write_report_template(
+            report_path,
+            has_rho2=has_rho2,
+            has_rho8=has_rho8,
+        )
 
     return PackageResult(out_dir=out_dir, assets_dir=assets_dir, packaged_assets=packaged_assets)
 
 
+def _package_report_assets(assets_dir: Path, results_dir: Path) -> int:
+    """Copy the additional assets referenced by the maintained report."""
+    packaged = 0
+
+    for scenario in REQUIRED_SCENARIOS:
+        packaged += _copy_first_existing(
+            [
+                results_dir / f"visualization_{scenario}_low_noise_eta0.png",
+                results_dir / f"visualization_{scenario}_eta0.png",
+            ],
+            assets_dir / f"snapshot_{scenario}.png",
+        )
+        packaged += _copy_first_existing(
+            [
+                results_dir / f"animation_{scenario}_low_noise_eta0.gif",
+            ],
+            assets_dir / f"animation_{scenario}_low_noise.gif",
+        )
+
+    packaged += _copy_first_existing(
+        [results_dir / "va_timeseries_A.pdf"],
+        assets_dir / "va_timeseries_A_rho4.pdf",
+    )
+    return packaged
+
+
 def _package_extra_densities(assets_dir: Path, extra_roots: list[Path]) -> int:
-    """Copy comparison figures and manifests from extra density runs."""
+    """Copy the extra-density assets referenced by the maintained report."""
     packaged = 0
     for root in extra_roots:
         rho_tag = _extract_rho_tag(root)
@@ -80,6 +109,10 @@ def _package_extra_densities(assets_dir: Path, extra_roots: list[Path]) -> int:
         manifest_src = results_dir / DEMO_MANIFEST_NAME
         if manifest_src.exists():
             shutil.copy2(manifest_src, assets_dir / f"demo_manifest_{rho_tag}.csv")
+            packaged += 1
+        timeseries_src = results_dir / "va_timeseries_A.pdf"
+        if timeseries_src.exists():
+            shutil.copy2(timeseries_src, assets_dir / f"va_timeseries_A_{rho_tag}.pdf")
             packaged += 1
     return packaged
 
@@ -151,6 +184,14 @@ def _validate_required_inputs(
 def _read_csv_rows(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as handle:
         return list(csv.DictReader(handle))
+
+
+def _copy_first_existing(candidates: list[Path], destination: Path) -> int:
+    for candidate in candidates:
+        if candidate.exists():
+            shutil.copy2(candidate, destination)
+            return 1
+    return 0
 
 
 
@@ -247,5 +288,4 @@ Agregar aqui la referencia al articulo de Vicsek y cualquier otra fuente citada 
 \end{document}
 """
     path.write_text(template + "\n", encoding="utf-8")
-
 

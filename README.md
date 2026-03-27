@@ -31,7 +31,7 @@ python3 -m pip install -e ".[dev]"
 
 ## Generar los entregables
 
-El script `generate_all.sh` ejecuta el pipeline completo: campañas de simulación para ρ=4 (obligatorio) y ρ=2, ρ=8 (opcionales), análisis, generación de figuras, y armado del bundle de entregables.
+El script `generate_all.sh` ejecuta el pipeline completo: campañas de simulación para ρ=4 (obligatorio) y ρ=2, ρ=8 (opcionales), análisis, generación de figuras y actualización del bundle de entregables.
 
 ```bash
 chmod +x generate_all.sh
@@ -43,7 +43,7 @@ chmod +x generate_all.sh
 1. **Campaña ρ=4** (obligatoria): simula A/B/C × 11 etas × 5 seeds = 165 corridas, analiza y genera figuras.
 2. **Campaña ρ=2** (opcional): ídem con N=200.
 3. **Campaña ρ=8** (opcional): ídem con N=800.
-4. **Packaging**: valida resultados, copia assets, genera el template del informe y arma el ZIP de código.
+4. **Packaging**: valida resultados, copia los assets usados por el informe y genera un template sólo si no existe ya un `.tex` manual en `deliverables/`.
 
 **Variables de entorno para override**:
 
@@ -62,7 +62,7 @@ FORCE_REBUILD=1 ./generate_all.sh
 |--------------------|-----------------------------------|------------------------------------|
 | `STEPS`            | 2000                              | Pasos de simulación                |
 | `SEEDS`            | 1,2,3,4,5                         | Seeds para promedios               |
-| `ETAS`             | 0.0,0.5,...,5.0                   | Valores de η                       |
+| `ETAS`             | 0.0,0.5,1.0,...,5.0               | Valores de η                       |
 | `RUNS_BASE`        | outputs                           | Directorio base de corridas        |
 | `DELIVERABLES_DIR` | deliverables                      | Directorio de salida del bundle    |
 | `FORCE_REBUILD`    | 0                                 | Forzar recálculo                   |
@@ -95,17 +95,18 @@ outputs/
 deliverables/                          ← bundle de entrega
   assets/
     snapshot_{A,B,C}.png                 ← capturas representativas
+    animation_{A,B,C}_low_noise.gif      ← GIFs adjuntos referenciados por el informe
     va_timeseries_{A,B,C}.pdf           ← evolución temporal promediada
+    va_timeseries_A_rho{2,4,8}.pdf      ← comparación temporal entre densidades
     eta_vs_va_{A,B,C}.pdf               ← va vs η por escenario
     eta_vs_va_comparison.pdf            ← comparación de los 3 escenarios
     eta_vs_va_comparison_rho2.pdf       (si --extra-runs-roots)
     eta_vs_va_comparison_rho8.pdf       (si --extra-runs-roots)
-    rho{2,8}_{low,high}_noise.png       ← capturas para densidades extra
   SdS_TP2_2026Q1G01S2_Informe.tex
   SdS_TP2_2026Q1G01S2_Informe.pdf
 ```
 
-La presentación se prepara manualmente y no forma parte de los archivos `.tex` generados por el pipeline.
+La presentación se prepara manualmente y no forma parte de los archivos `.tex` generados por el pipeline. El informe final del repo se mantiene manualmente en `deliverables/`; el packaging no lo sobreescribe si ya existe.
 
 ## Comandos CLI
 

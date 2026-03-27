@@ -28,11 +28,13 @@ from .io_extxyz import iter_extxyz
 from .simulation import LEADER_TYPE, TAU, simulate_trajectory, write_simulation_run
 
 matplotlib.use("Agg")
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, ticker
 from matplotlib.animation import FuncAnimation, PillowWriter
 from matplotlib.cm import get_cmap
 
 LEADER_MAGENTA = "#CC00CC"
+DISPLAY_ETA_TICKS = (0.0, 2.5, 5.0)
+REPORT_STATIONARY_START = 600
 
 
 def _break_periodic_trail(
@@ -49,6 +51,16 @@ def _break_periodic_trail(
         x = np.insert(x, breaks, np.nan)
         y = np.insert(y, breaks, np.nan)
     return x, y
+
+
+def _format_eta_display(eta: float) -> str:
+    return f"{eta:.1f}"
+
+
+def _configure_eta_axis(axis: plt.Axes) -> None:
+    axis.set_xlim(0.0, 5.0)
+    axis.set_xticks(DISPLAY_ETA_TICKS)
+    axis.xaxis.set_major_formatter(ticker.FormatStrFormatter("%.1f"))
 
 DEFAULT_CAMPAIGN_SCENARIOS = ("A", "B", "C")
 DEFAULT_CAMPAIGN_ETAS = tuple(index * 0.5 for index in range(11))
@@ -336,7 +348,7 @@ def _plot_va_timeseries(
 
     figure, axis = plt.subplots(figsize=(7, 4))
     colors = ["C0", "C1", "C2", "C3", "C4"]
-    transient_drawn = False
+    stationary_marker_drawn = False
 
     for idx, eta in enumerate(etas_to_plot):
         # Find closest available eta
@@ -364,24 +376,22 @@ def _plot_va_timeseries(
         mean = matrix.mean(axis=0)
         std = matrix.std(axis=0, ddof=1) if matrix.shape[0] > 1 else np.zeros_like(mean)
 
-        axis.plot(times, mean, color=color, linewidth=1.4, label=f"$\\eta={format_eta(closest_eta)}$")
+        axis.plot(times, mean, color=color, linewidth=1.4, label=rf"$\eta={_format_eta_display(closest_eta)}$")
         axis.fill_between(times, mean - std, mean + std, color=color, alpha=0.2)
 
-        # Draw transient cutoff once
-        if not transient_drawn:
-            t_start = eta_records[0].summary.t_start
-            cutoff_time = times[t_start]
-            axis.axvline(cutoff_time, color="gray", linestyle="--", linewidth=1.0, alpha=0.5)
-            axis.axvspan(times[0], cutoff_time, alpha=0.07, color="gray")
-            mid_transient = (times[0] + cutoff_time) / 2
-            axis.text(mid_transient, 1.0, "transiente", ha="center", va="top", fontsize=8, color="gray", alpha=0.7)
-            mid_stationary = (cutoff_time + times[-1]) / 2
-            axis.text(mid_stationary, 1.0, "estado estacionario", ha="center", va="top", fontsize=8, color="gray", alpha=0.7)
-            transient_drawn = True
+        if not stationary_marker_drawn:
+            cutoff_time = float(REPORT_STATIONARY_START)
+            if cutoff_time < times[0] or cutoff_time > times[-1]:
+                t_start = min(max(eta_records[0].summary.t_start, 0), len(times) - 1)
+                cutoff_time = float(times[t_start])
+            axis.axvline(cutoff_time, color="0.45", linestyle="--", linewidth=1.1, alpha=0.9)
+            stationary_marker_drawn = True
 
     axis.set_xlabel(r"Tiempo (pasos)")
     axis.set_ylabel(r"Polarización $v_a$")
     axis.set_ylim(-0.05, 1.05)
+    axis.set_xlim(left=0.0)
+    axis.set_xticks([0.0, float(REPORT_STATIONARY_START), 1200.0, 1800.0])
     axis.legend()
     _save_figure(figure, results_directory / f"va_timeseries_{scenario}")
 
@@ -397,8 +407,8 @@ def _plot_eta_vs_va(results_directory: Path, scenario: str, points: list[Aggrega
     axis.errorbar(etas, means, yerr=stds, fmt="o", color="C0", markersize=4, capsize=3)
     axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
     axis.set_ylabel(r"Polarización media ($v_a$)")
-    axis.set_title(f"Escenario {scenario}")
     axis.set_ylim(-0.05, 1.05)
+    _configure_eta_axis(axis)
     _save_figure(figure, results_directory / f"eta_vs_va_{scenario}")
 
 
@@ -427,8 +437,8 @@ def _plot_eta_vs_va_comparison(
 
     axis.set_xlabel(r"Amplitud de ruido ($\eta$)")
     axis.set_ylabel(r"Polarización media ($v_a$)")
-    axis.set_title("Comparación entre escenarios")
     axis.set_ylim(-0.05, 1.05)
+    _configure_eta_axis(axis)
     axis.legend()
     _save_figure(figure, results_directory / "eta_vs_va_comparison")
 
@@ -624,8 +634,8 @@ def animate_trajectory(
     axis.set_ylim(0, box_length)
     axis.set_xticks([])
     axis.set_yticks([])
-    title = axis.set_title(f"t = {frames[0]['time']:.0f}", color="white", fontsize=12)
     figure.patch.set_facecolor("black")
+    figure.subplots_adjust(left=0.02, right=0.98, bottom=0.02, top=0.98)
 
     f0 = frames[0]
     nm = f0["normal"]
@@ -671,7 +681,6 @@ def animate_trajectory(
                 np.array(leader_trail_x), np.array(leader_trail_y), box_length,
             )
             leader_trail_line.set_data(tx, ty)
-        title.set_text(f"t = {data['time']:.0f}")
 
     animation = FuncAnimation(figure, _update, frames=len(frames), interval=1000 // fps, blit=False)
     gif_path = output_path.with_suffix(".gif")
@@ -689,8 +698,6 @@ def plot_visualization_figure(
     eta: float | None = None,
     dpi: int = 200,
 ) -> Path:
-    from collections import deque
-
     # Collect leader trail positions while iterating to the target frame.
     leader_trail_x: list[float] = []
     leader_trail_y: list[float] = []
@@ -720,27 +727,10 @@ def plot_visualization_figure(
     hsv_cmap = get_cmap("hsv")
     colors = hsv_cmap((angles % TAU) / TAU)
 
-    N_particles = int(frame.ids.shape[0])
     L = box_length
 
-    figure = plt.figure(figsize=(12, 7), facecolor="white")
-    gs = figure.add_gridspec(1, 2, width_ratios=[3, 1.3], wspace=0.3)
-    ax_main = figure.add_subplot(gs[0, 0])
-    ax_wheel = figure.add_subplot(gs[0, 1], projection="polar")
-
-    figure.suptitle(
-        "VISUALIZACIÓN DE BANDADA DE PARTÍCULAS AUTOPROPULSADAS (MODELO DE VICSEK)",
-        fontsize=13,
-        fontweight="bold",
-        y=0.97,
-    )
-
-    eta_str = f"{eta:.1f}" if eta is not None else "?"
-    ax_main.set_title(
-        f"Parámetros de simulación: (N={N_particles}, L={L:.0f}, \u03b7={eta_str})",
-        fontsize=10,
-        pad=8,
-    )
+    figure, ax_main = plt.subplots(figsize=(6.8, 6.8), facecolor="white")
+    figure.subplots_adjust(left=0.02, right=0.98, bottom=0.02, top=0.98)
 
     # --- Main panel ---
     ax_main.set_facecolor("white")
@@ -796,52 +786,10 @@ def plot_visualization_figure(
                 tx, ty, linestyle=":", color=LEADER_MAGENTA,
                 alpha=0.5, linewidth=1.5, zorder=5,
             )
-        lx = float(frame.positions[leader_mask, 0][0])
-        ly = float(frame.positions[leader_mask, 1][0])
-        # Place annotation away from edges to avoid overlapping with titles
-        dx = -L * 0.15 if lx > L * 0.5 else L * 0.15
-        dy = -L * 0.15 if ly > L * 0.5 else L * 0.15
-        ax_main.annotate(
-            "Partícula líder\n(color fijo único)",
-            xy=(lx, ly),
-            xytext=(lx + dx, ly + dy),
-            fontsize=8,
-            fontweight="bold",
-            ha="center",
-            arrowprops=dict(arrowstyle="->", color="black", lw=1.5),
-            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=1),
-        )
-
-    # --- Color wheel panel ---
-    theta_wheel = np.linspace(0, TAU, 256)
-    r_wheel = np.linspace(0, 1, 2)
-    theta_grid, r_grid = np.meshgrid(theta_wheel, r_wheel)
-    color_values = theta_grid / TAU
-    ax_wheel.pcolormesh(theta_grid, r_grid, color_values, cmap="hsv", shading="auto")
-    ax_wheel.set_yticks([])
-    ax_wheel.set_xticks([0, np.pi / 2, np.pi, 3 * np.pi / 2])
-    ax_wheel.set_xticklabels(["0 / 2\u03c0", "\u03c0/2", "\u03c0", "3\u03c0/2"], fontsize=8)
-
-    n_arrows = 12
-    for i in range(n_arrows):
-        a = i * TAU / n_arrows
-        c = hsv_cmap(a / TAU)
-        ax_wheel.annotate(
-            "",
-            xy=(a, 0.85),
-            xytext=(a, 0.45),
-            arrowprops=dict(arrowstyle="->", color=c, lw=2),
-        )
-
-    ax_wheel.set_title(
-        "Mapeo cíclico\ndirección \u2192 color\n(0 a 2\u03c0 radianes)",
-        fontsize=9,
-        pad=12,
-    )
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    figure.savefig(output_path.with_suffix(".png"), dpi=dpi, bbox_inches="tight")
-    figure.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight")
+    figure.savefig(output_path.with_suffix(".png"), dpi=dpi, bbox_inches="tight", pad_inches=0.02)
+    figure.savefig(output_path.with_suffix(".pdf"), bbox_inches="tight", pad_inches=0.02)
     plt.close(figure)
     return output_path.with_suffix(".png")
 
@@ -875,11 +823,6 @@ def plot_angular_correlation(
     ax_angles.axhline(np.pi, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
     ax_angles.axhline(-np.pi, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
     ax_angles.legend(loc="upper right")
-    title = f"Escenario {scenario}" if scenario else "Correlación angular"
-    if eta > 0:
-        title += rf" ($\eta$ = {eta:.1f})"
-    ax_angles.set_title(title)
-
     ax_corr.plot(times, correlation, linewidth=1.0, color="C2")
     ax_corr.set_xlabel(r"Tiempo (pasos)")
     ax_corr.set_ylabel(r"$C(t) = \cos(\theta_L - \theta_S)$")
